@@ -7,7 +7,7 @@
 :root{--bg:#fbf7ee;--card:#fffdf8;--ink:#2a2620;--mute:#7a7364;--line:#ece4d2;--logic:#3b5bff;--logic2:#e9edfb;--color:#ff5a3c;--color2:#fdebdd;--ok:#13a36b;--bad:#e5384f;color-scheme:light}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12111d;--card:#1c1b2c;--ink:#f1f0fa;--mute:#9a98b5;--line:#2e2c46;--logic:#7b93ff;--logic2:#252a55;--color:#ff8366;--color2:#4a2a25;--ok:#32d296;--bad:#ff6b80;color-scheme:dark}}
 :root[data-theme="dark"]{--bg:#12111d;--card:#1c1b2c;--ink:#f1f0fa;--mute:#9a98b5;--line:#2e2c46;--logic:#7b93ff;--logic2:#252a55;--color:#ff8366;--color2:#4a2a25;--ok:#32d296;--bad:#ff6b80;color-scheme:dark}
-*{box-sizing:border-box;touch-action:manipulation}
+*{box-sizing:border-box;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:'Bricolage Grotesque',system-ui,-apple-system,Segoe UI,sans-serif;display:flex;flex-direction:column;align-items:center;gap:14px;padding:calc(16px + env(safe-area-inset-top,0px)) 12px calc(24px + env(safe-area-inset-bottom,0px))}
 .bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center}
 a,button,select{font:inherit;font-weight:700;color:var(--ink);background:var(--card);border:2px solid var(--line);border-radius:99px;padding:8px 16px;cursor:pointer;text-decoration:none}
@@ -24,8 +24,9 @@ button.on{background:var(--color);border-color:var(--color);color:#fff}
 .c.rel{background:var(--logic2)} .c.same{background:var(--color2)} .c.sel{background:var(--logic);color:#fff}
 .c.user{color:var(--logic);font-weight:700} .c.sel.user{color:#fff} .c.bad{background:var(--bad);color:#fff}
 .n{position:absolute;inset:1px;display:grid;grid-template-columns:repeat(3,1fr);font-size:clamp(8px,2.2vw,11px);font-weight:700;color:var(--mute);text-align:center;line-height:1.2}
-#pad{display:grid;grid-template-columns:repeat(9,1fr);gap:6px;width:min(94vw,468px)}
-#pad button{padding:12px 0;font-size:20px;font-weight:800;border-radius:16px}
+#pad{display:grid;grid-template-columns:repeat(9,1fr);gap:4px;width:min(94vw,468px)}
+#pad button{padding:0;min-height:54px;font-size:22px;font-weight:800;border-radius:14px}
+.ver{font-size:12px;color:var(--mute);opacity:.7}
 </style></head><body>
 <div class="bar"><a href="../index.html">← Portal</a>
  <select id="lvl"><option value="40">Easy</option><option value="33" selected>Medium</option><option value="28">Hard</option></select>
@@ -34,6 +35,7 @@ button.on{background:var(--color);border-color:var(--color);color:#fff}
 <div id="pad"></div>
 <div class="bar"><button id="notes">Notes: off</button><button id="erase">Erase</button><button id="check">Check</button><button id="hint">Hint</button></div>
 <div id="msg"></div>
+<div class="ver">v1.1</div>
 <script>
 /*LOGIC*/
 const cands=(g,i)=>{const r=i/9|0,c=i%9,u=new Set();
@@ -53,9 +55,10 @@ const $=s=>document.querySelector(s),board=$("#board");
 for(let i=0;i<81;i++){const d=document.createElement("div");d.className="c";d.onclick=()=>{sel=i;draw();};board.appendChild(d);}
 for(let v=1;v<=9;v++){const b=document.createElement("button");b.textContent=v;b.onclick=()=>enter(v);$("#pad").appendChild(b);}
 function newGame(){const{sol:s,p}=generate(+$("#lvl").value);sol=s;given=p.map(v=>!!v);val=p.slice();notes=Array.from({length:81},()=>new Set());
- sel=-1;done=false;t0=Date.now();clearInterval(timer);timer=setInterval(tick,1000);$("#msg").textContent="";draw();}
+ sel=val.findIndex(v=>!v);done=false;t0=Date.now();clearInterval(timer);timer=setInterval(tick,1000);$("#msg").textContent="";draw();}
 function tick(){if(done)return;const s=(Date.now()-t0)/1000|0;$("#time").textContent=(s/60|0)+":"+String(s%60).padStart(2,"0");}
-function enter(v){if(sel<0||given[sel]||done)return;
+function enter(v){if(done)return;if(sel<0||given[sel]){$("#msg").textContent=sel<0?"Tap a cell first":"That number is fixed - pick an empty cell";return;}
+ $("#msg").textContent="";
  if(noteMode&&v){notes[sel].has(v)?notes[sel].delete(v):notes[sel].add(v);}
  else{val[sel]=v;notes[sel].clear();if(v){const r=sel/9|0,c=sel%9;for(let k=0;k<9;k++){notes[r*9+k].delete(v);notes[k*9+c].delete(v);}}}
  draw();if(val.every((x,i)=>x===sol[i])){done=true;$("#msg").textContent="Solved! 🎉 "+$("#time").textContent;}}
