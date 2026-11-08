@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sudoku</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&display=swap" rel="stylesheet">
+<script>try{var t=localStorage.getItem('bs-theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<style>
+:root{--bg:#fbf7ee;--card:#fffdf8;--ink:#2a2620;--mute:#7a7364;--line:#ece4d2;--logic:#3b5bff;--logic2:#e9edfb;--color:#ff5a3c;--color2:#fdebdd;--ok:#13a36b;--bad:#e5384f;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12111d;--card:#1c1b2c;--ink:#f1f0fa;--mute:#9a98b5;--line:#2e2c46;--logic:#7b93ff;--logic2:#252a55;--color:#ff8366;--color2:#4a2a25;--ok:#32d296;--bad:#ff6b80;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#12111d;--card:#1c1b2c;--ink:#f1f0fa;--mute:#9a98b5;--line:#2e2c46;--logic:#7b93ff;--logic2:#252a55;--color:#ff8366;--color2:#4a2a25;--ok:#32d296;--bad:#ff6b80;color-scheme:dark}
+*{box-sizing:border-box;touch-action:manipulation}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Bricolage Grotesque',system-ui,-apple-system,Segoe UI,sans-serif;display:flex;flex-direction:column;align-items:center;gap:14px;padding:calc(16px + env(safe-area-inset-top,0px)) 12px calc(24px + env(safe-area-inset-bottom,0px))}
+.bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center}
+a,button,select{font:inherit;font-weight:700;color:var(--ink);background:var(--card);border:2px solid var(--line);border-radius:99px;padding:8px 16px;cursor:pointer;text-decoration:none}
+a:hover,button:hover,select:hover{border-color:var(--ink)}
+:focus-visible{outline:3px solid var(--logic);outline-offset:2px}
+button.on{background:var(--color);border-color:var(--color);color:#fff}
+#msg{min-height:1.4em;font-weight:800;color:var(--ok)}
+#new{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+#time{font-weight:800;color:var(--mute);min-width:3ch}
+#board{display:grid;grid-template-columns:repeat(9,1fr);width:min(94vw,468px);aspect-ratio:1;border:3px solid var(--ink);border-radius:18px;overflow:hidden;background:var(--mute);gap:1px}
+.c{background:var(--card);display:grid;place-items:center;font-size:clamp(18px,5.4vw,28px);font-weight:800;position:relative;cursor:pointer;user-select:none}
+.c:nth-child(9n+3),.c:nth-child(9n+6){margin-right:2px}
+.c:nth-child(n+19):nth-child(-n+27),.c:nth-child(n+46):nth-child(-n+54){margin-bottom:2px}
+.c.rel{background:var(--logic2)} .c.same{background:var(--color2)} .c.sel{background:var(--logic);color:#fff}
+.c.user{color:var(--logic);font-weight:700} .c.sel.user{color:#fff} .c.bad{background:var(--bad);color:#fff}
+.n{position:absolute;inset:1px;display:grid;grid-template-columns:repeat(3,1fr);font-size:clamp(8px,2.2vw,11px);font-weight:700;color:var(--mute);text-align:center;line-height:1.2}
+#pad{display:grid;grid-template-columns:repeat(9,1fr);gap:6px;width:min(94vw,468px)}
+#pad button{padding:12px 0;font-size:20px;font-weight:800;border-radius:16px}
+</style></head><body>
+<div class="bar"><a href="../index.html">← Portal</a>
+ <select id="lvl"><option value="40">Easy</option><option value="33" selected>Medium</option><option value="28">Hard</option></select>
+ <button id="new">New puzzle</button><span id="time">0:00</span></div>
+<div id="board" role="grid" aria-label="Sudoku board"></div>
+<div id="pad"></div>
+<div class="bar"><button id="notes">Notes: off</button><button id="erase">Erase</button><button id="check">Check</button><button id="hint">Hint</button></div>
+<div id="msg"></div>
+<script>
+/*LOGIC*/
+const cands=(g,i)=>{const r=i/9|0,c=i%9,u=new Set();
+ for(let k=0;k<9;k++){u.add(g[r*9+k]);u.add(g[k*9+c]);}
+ const br=r-r%3,bc=c-c%3;for(let a=0;a<3;a++)for(let b=0;b<3;b++)u.add(g[(br+a)*9+bc+b]);
+ const o=[];for(let v=1;v<=9;v++)if(!u.has(v))o.push(v);return o;};
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;};
+function pick(g){let best=-1,bc=null;for(let i=0;i<81;i++)if(!g[i]){const c=cands(g,i);if(!bc||c.length<bc.length){best=i;bc=c;if(c.length<2)break;}}return[best,bc];}
+function count(g,lim){const[i,c]=pick(g);if(i<0)return 1;let n=0;for(const v of c){g[i]=v;n+=count(g,lim-n);if(n>=lim)break;}g[i]=0;return n;}
+function fill(g){const[i,c]=pick(g);if(i<0)return true;for(const v of shuffle(c)){g[i]=v;if(fill(g))return true;}g[i]=0;return false;}
+function generate(clues){const sol=Array(81).fill(0);fill(sol);const p=sol.slice();let left=81;
+ for(const i of shuffle([...Array(81).keys()])){if(left<=clues)break;const v=p[i];p[i]=0;if(count(p.slice(),2)!==1)p[i]=v;else left--;}
+ return{sol,p};}
+/*END*/
+let sol,given,val,notes,sel=-1,noteMode=false,t0,timer,done;
+const $=s=>document.querySelector(s),board=$("#board");
+for(let i=0;i<81;i++){const d=document.createElement("div");d.className="c";d.onclick=()=>{sel=i;draw();};board.appendChild(d);}
+for(let v=1;v<=9;v++){const b=document.createElement("button");b.textContent=v;b.onclick=()=>enter(v);$("#pad").appendChild(b);}
+function newGame(){const{sol:s,p}=generate(+$("#lvl").value);sol=s;given=p.map(v=>!!v);val=p.slice();notes=Array.from({length:81},()=>new Set());
+ sel=-1;done=false;t0=Date.now();clearInterval(timer);timer=setInterval(tick,1000);$("#msg").textContent="";draw();}
+function tick(){if(done)return;const s=(Date.now()-t0)/1000|0;$("#time").textContent=(s/60|0)+":"+String(s%60).padStart(2,"0");}
+function enter(v){if(sel<0||given[sel]||done)return;
+ if(noteMode&&v){notes[sel].has(v)?notes[sel].delete(v):notes[sel].add(v);}
+ else{val[sel]=v;notes[sel].clear();if(v){const r=sel/9|0,c=sel%9;for(let k=0;k<9;k++){notes[r*9+k].delete(v);notes[k*9+c].delete(v);}}}
+ draw();if(val.every((x,i)=>x===sol[i])){done=true;$("#msg").textContent="Solved! 🎉 "+$("#time").textContent;}}
+function draw(showBad){[...board.children].forEach((d,i)=>{
+ const r=i/9|0,c=i%9,sr=sel/9|0,sc=sel%9,v=val[i];
+ let cls="c"+(given[i]?" given":v?" user":"");
+ if(sel>=0){if(i===sel)cls+=" sel";else if(v&&v===val[sel])cls+=" same";else if(r===sr||c===sc||((r/3|0)===(sr/3|0)&&(c/3|0)===(sc/3|0)))cls+=" rel";}
+ if(showBad&&v&&!given[i]&&v!==sol[i])cls+=" bad";
+ d.className=cls;
+ d.innerHTML=v?v:(notes[i].size?'<div class="n">'+[1,2,3,4,5,6,7,8,9].map(n=>`<span>${notes[i].has(n)?n:""}</span>`).join("")+"</div>":"");});}
+addEventListener("keydown",e=>{
+ if(e.key>="1"&&e.key<="9")enter(+e.key);else if(e.key==="Backspace"||e.key==="Delete"||e.key==="0")enter(0);
+ else if(e.key==="n")$("#notes").click();
+ else{const m={ArrowUp:-9,ArrowDown:9,ArrowLeft:-1,ArrowRight:1}[e.key];if(m!==undefined){e.preventDefault();sel=Math.max(0,Math.min(80,(sel<0?40:sel)+m));draw();}}});
+$("#new").onclick=newGame;$("#lvl").onchange=newGame;
+$("#erase").onclick=()=>enter(0);
+$("#notes").onclick=e=>{noteMode=!noteMode;e.target.textContent="Notes: "+(noteMode?"on":"off");e.target.classList.toggle("on",noteMode);};
+$("#check").onclick=()=>{draw(true);const bad=val.some((v,i)=>v&&v!==sol[i]);$("#msg").textContent=bad?"Red cells are wrong.":"No mistakes so far.";};
+$("#hint").onclick=()=>{if(done)return;let i=sel>=0&&!given[sel]?sel:val.findIndex((v,k)=>v!==sol[k]);if(i<0)return;sel=i;val[i]=sol[i];notes[i].clear();given[i]=true;draw();if(val.every((x,k)=>x===sol[k])){done=true;$('#msg').textContent='Solved!';}};
+newGame();
+</script></body></html>

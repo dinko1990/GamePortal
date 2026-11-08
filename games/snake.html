@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Snake</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&display=swap" rel="stylesheet">
+<script>try{var t=localStorage.getItem('bs-theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<style>
+:root{--bg:#fbf7ee;--card:#fffdf8;--ink:#2a2620;--mute:#7a7364;--line:#ece4d2;--logic:#3b5bff;--logic2:#e9edfb;--color:#ff5a3c;--color2:#fdebdd;--ok:#13a36b;--bad:#e5384f;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12111d;--card:#1c1b2c;--ink:#f1f0fa;--mute:#9a98b5;--line:#2e2c46;--logic:#7b93ff;--logic2:#252a55;--color:#ff8366;--color2:#4a2a25;--ok:#32d296;--bad:#ff6b80;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#12111d;--card:#1c1b2c;--ink:#f1f0fa;--mute:#9a98b5;--line:#2e2c46;--logic:#7b93ff;--logic2:#252a55;--color:#ff8366;--color2:#4a2a25;--ok:#32d296;--bad:#ff6b80;color-scheme:dark}
+*{box-sizing:border-box;touch-action:manipulation}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Bricolage Grotesque',system-ui,-apple-system,Segoe UI,sans-serif;display:flex;flex-direction:column;align-items:center;gap:14px;padding:calc(16px + env(safe-area-inset-top,0px)) 12px calc(24px + env(safe-area-inset-bottom,0px))}
+.bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center}
+a,button,select{font:inherit;font-weight:700;color:var(--ink);background:var(--card);border:2px solid var(--line);border-radius:99px;padding:8px 16px;cursor:pointer;text-decoration:none}
+a:hover,button:hover,select:hover{border-color:var(--ink)}
+:focus-visible{outline:3px solid var(--logic);outline-offset:2px}
+button.on{background:var(--color);border-color:var(--color);color:#fff}
+#msg{min-height:1.4em;font-weight:800;color:var(--ok)}
+canvas{touch-action:none;background:var(--card);border:3px solid var(--ink);border-radius:18px;max-width:94vw;height:auto}
+.hud{font-weight:800;display:flex;gap:10px;align-items:center}
+.tip{font-size:14px;color:var(--mute)}
+#dpad{display:grid;grid-template-columns:repeat(3,68px);gap:8px}
+#dpad button{height:56px;font-size:22px;border-radius:18px;padding:0}
+#dpad .u{grid-column:2}
+</style></head><body>
+<div class="hud"><a href="../index.html">← Portal</a><span>Score <span id="s">0</span></span></div>
+<canvas id="c" width="400" height="400"></canvas>
+<div class="tip">Swipe, arrow keys or WASD</div>
+<div id="dpad"><button class="u" data-x="0" data-y="-1" aria-label="Up">▲</button><button data-x="-1" data-y="0" aria-label="Left">◀</button><button data-x="0" data-y="1" aria-label="Down">▼</button><button data-x="1" data-y="0" aria-label="Right">▶</button></div>
+<script>
+const V=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const c=document.getElementById("c"),x=c.getContext("2d"),N=20,S=20;
+let snake,dir,food,score,timer;
+function reset(){snake=[{x:10,y:10}];dir={x:1,y:0};score=0;place();document.getElementById("s").textContent=0;
+ clearInterval(timer);timer=setInterval(step,110);}
+function place(){food={x:Math.floor(Math.random()*N),y:Math.floor(Math.random()*N)};}
+function step(){
+ const h={x:snake[0].x+dir.x,y:snake[0].y+dir.y};
+ if(h.x<0||h.y<0||h.x>=N||h.y>=N||snake.some(p=>p.x==h.x&&p.y==h.y))return reset();
+ snake.unshift(h);
+ if(h.x==food.x&&h.y==food.y){score++;document.getElementById("s").textContent=score;place();}else snake.pop();
+ x.clearRect(0,0,400,400);
+ x.fillStyle=V("--color");x.beginPath();x.arc(food.x*S+S/2,food.y*S+S/2,S/2-2,0,7);x.fill();
+ x.fillStyle=V("--logic");snake.forEach(p=>{x.beginPath();x.roundRect(p.x*S+1,p.y*S+1,S-2,S-2,6);x.fill()});
+}
+addEventListener("keydown",e=>{
+ const m={ArrowUp:[0,-1],w:[0,-1],ArrowDown:[0,1],s:[0,1],ArrowLeft:[-1,0],a:[-1,0],ArrowRight:[1,0],d:[1,0]}[e.key];
+ if(m&&!(m[0]==-dir.x&&m[1]==-dir.y)){dir={x:m[0],y:m[1]};e.preventDefault();}
+});
+function turn(dx,dy){if(!(dx==-dir.x&&dy==-dir.y))dir={x:dx,y:dy};}
+let tx,ty;
+c.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
+c.addEventListener("touchend",e=>{const t=e.changedTouches[0],dx=t.clientX-tx,dy=t.clientY-ty;
+ if(Math.max(Math.abs(dx),Math.abs(dy))<20)return;
+ Math.abs(dx)>Math.abs(dy)?turn(Math.sign(dx),0):turn(0,Math.sign(dy));});
+document.querySelectorAll("#dpad button").forEach(b=>b.onclick=()=>turn(+b.dataset.x,+b.dataset.y));
+reset();
+</script></body></html>
