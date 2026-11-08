@@ -26,12 +26,14 @@ a.game:focus-visible,.themebtn:focus-visible{outline:3px solid var(--logic);outl
 .name{font-weight:800;font-size:20px;letter-spacing:-.01em;line-height:1.1;overflow-wrap:anywhere}
 .msg{grid-column:1/-1;text-align:center;color:var(--mute);line-height:1.6}
 code{background:var(--logic2);color:var(--logic);border-radius:6px;padding:1px 6px}
+.ver{position:fixed;left:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));font-size:12px;color:var(--mute);opacity:.7;pointer-events:none}
 .themebtn{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));cursor:pointer}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
 <button class="pill themebtn" id="theme" type="button"></button>
+<div class="ver">v1.1</div>
 <main>
   <div class="hero">
     <h1><span>Game</span><br><span>Portal</span></h1>
