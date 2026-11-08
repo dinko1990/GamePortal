@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Brain Split</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fbf7ee;--card:#fffdf8;--ink:#2a2620;--mute:#7a7364;--line:#ece4d2;--logic:#3b5bff;--logic2:#e9edfb;--color:#ff5a3c;--color2:#fdebdd;--ok:#13a36b;--bad:#e5384f;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12111d;--card:#1c1b2c;--ink:#f1f0fa;--mute:#9a98b5;--line:#2e2c46;--logic:#7b93ff;--logic2:#252a55;--color:#ff8366;--color2:#4a2a25;--ok:#32d296;--bad:#ff6b80;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#12111d;--card:#1c1b2c;--ink:#f1f0fa;--mute:#9a98b5;--line:#2e2c46;--logic:#7b93ff;--logic2:#252a55;--color:#ff8366;--color2:#4a2a25;--ok:#32d296;--bad:#ff6b80;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);font-family:'Bricolage Grotesque',system-ui,-apple-system,Segoe UI,sans-serif;display:flex;justify-content:center;transition:background .4s}
+main{width:100%;max-width:880px;padding:20px 12px 72px;display:flex;flex-direction:column;gap:16px}
+.top{display:flex;justify-content:space-between;align-items:center;font-weight:700}
+.pill{background:var(--card);border:1px solid var(--line);border-radius:99px;padding:6px 14px;font-size:14px}
+.dots{display:flex;gap:6px}.dots i{width:22px;height:6px;border-radius:4px;background:var(--line)}.dots i.on{background:var(--ink)}.dots i.done{background:var(--ok)}.dots i.fail{background:var(--bad)}
+.bar{height:10px;background:var(--line);border-radius:9px;overflow:hidden}
+.bar b{display:block;height:100%;width:100%;background:var(--ink);transform-origin:left;transition:background .3s}
+.bar.low b{background:var(--bad)}
+.stage{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px 6px;text-align:center;min-height:170px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:12px}
+.tag{font-size:14px;font-weight:700;padding:4px 12px;border-radius:99px}
+.tag.m{background:var(--logic2);color:var(--logic)}.tag.c{background:var(--color2);color:var(--color)}
+.q{font-size:clamp(24px,6.5vw,52px);font-weight:800;letter-spacing:-.02em;line-height:1}
+.mix{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:4px;font-size:clamp(20px,6vw,30px);font-weight:800}
+.sw{width:clamp(34px,9vw,56px);height:clamp(34px,9vw,56px);border-radius:50%;border:3px solid var(--card);box-shadow:0 0 0 1px var(--line)}
+.sw.q2{display:grid;place-items:center;background:var(--bg);font-size:30px;color:var(--mute)}
+.hint{font-size:14px;color:var(--mute);min-height:18px}
+.panels{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.panel{display:flex;flex-direction:column;gap:10px;border-radius:22px;padding:4px;border:2px solid transparent}
+.panel.done{border-color:var(--ink)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.opt{font:inherit;font-weight:800;font-size:clamp(18px,5vw,26px);color:var(--ink);background:var(--card);border:2px solid var(--line);border-radius:20px;padding:12px 4px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;min-height:76px;justify-content:center;transition:transform .12s,border-color .12s}
+.opt:hover{border-color:var(--ink)}.opt:active{transform:scale(.97)}
+.opt:focus-visible,.btn:focus-visible{outline:3px solid var(--logic);outline-offset:2px}
+.opt .sw{width:36px;height:36px}.opt small{font-size:clamp(11px,3vw,14px);font-weight:700;color:var(--mute)}
+.opt.pick{border-color:var(--ink)}.opt.ok{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 16%,var(--card))}
+.opt.bad{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 16%,var(--card))}
+.grid.lock .opt{pointer-events:none}.tip{font-size:13px;color:var(--mute);text-align:center}
+.btn{font:inherit;font-weight:800;font-size:18px;border:0;border-radius:18px;padding:16px 28px;background:var(--ink);color:var(--bg);cursor:pointer}
+.center{text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px;padding:30px 0}
+h1{font-size:clamp(44px,14vw,68px);margin:0;letter-spacing:-.03em;line-height:.95}
+h1 span:first-child{color:var(--logic)}h1 span:last-child{color:var(--color)}
+p{margin:0;color:var(--mute);max-width:36ch;line-height:1.45}
+.big{font-size:56px;font-weight:800}
+.shake{animation:sh .3s}@keyframes sh{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@media (prefers-reduced-motion:reduce){.shake{animation:none}*{transition:none!important}}
+.themebtn{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:5;font:inherit;font-weight:700;color:var(--ink);cursor:pointer}
+#cf{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:20}
+@keyframes pop{0%{transform:scale(.3);opacity:0}70%{transform:scale(1.2)}100%{transform:scale(1);opacity:1}}
+.rec{font-size:clamp(26px,8vw,40px);font-weight:800;color:var(--color);animation:pop .7s ease-out}
+.bonus{background:var(--card);border:2px solid var(--bad);color:var(--bad);border-radius:18px;padding:10px 20px;font-weight:800;font-size:22px;animation:pop .6s ease-out}
+.bonus span{display:block;font-size:14px;color:var(--mute);font-weight:600}
+@media (prefers-reduced-motion:reduce){.rec,.bonus{animation:none}}
+.ver{position:fixed;left:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));font-size:12px;color:var(--mute);opacity:.7;pointer-events:none}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<button class="pill themebtn" id="theme" type="button"></button>
+<canvas id="cf" aria-hidden="true"></canvas>
+<main id="app"></main>
+<div class="ver">v1.0</div>
+<script>
+const $=s=>document.querySelector(s),app=$('#app');
+const MIX={ // paint-style mixing
+ 'Red+Yellow':['Orange','#ff8a1f'],'Blue+Yellow':['Green','#2fb344'],'Red+Blue':['Purple','#8a3ffc'],
+ 'Red+White':['Pink','#ff9ec4'],'Blue+White':['Light blue','#8fc8ff'],'Black+White':['Gray','#8a8a96'],
+ 'Green+Red':['Brown','#8a5130'],'Yellow+White':['Cream','#fff1a8'],'Blue+Black':['Navy','#1c2a5e'],
+ 'Red+Black':['Maroon','#7a1425'],'Green+White':['Mint','#a6f0c6'],'Purple+White':['Lavender','#cdb4ff'],
+ 'Orange+White':['Peach','#ffd0a6'],'Green+Black':['Forest','#1f5a34'],'Red+Orange':['Red-orange','#ff5a1f'],'Yellow+Green':['Lime','#b6e32f'],'Blue+Green':['Teal','#12a6a6'],'Red+Purple':['Magenta','#d0188f'],'Yellow+Orange':['Amber','#ffb21f'],'Blue+Purple':['Indigo','#4b3fd6']};
+const BASE={Red:'#e5384f',Yellow:'#ffd23f',Blue:'#2f6bff',White:'#ffffff',Black:'#15141f',Green:'#2fb344',Purple:'#8a3ffc',Orange:'#ff8a1f'};
+const LV_POOL=[['Red+Yellow','Blue+Yellow','Red+Blue','Red+White','Blue+White','Black+White'],Object.keys(MIX).slice(0,12),Object.keys(MIX),Object.keys(MIX)];
+const rnd=n=>Math.floor(Math.random()*n),pick=a=>a[rnd(a.length)];
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a};
+const timeFor=l=>Math.max(6,15-(l-1)*1.5);
+let S;
+function best(){try{return +localStorage.getItem('bs-best')||0}catch(e){return 0}}
+function saveBest(v){try{localStorage.setItem('bs-best',v)}catch(e){}}
+
+function mathQ(l){
+ let a,b,t,ans;
+ if(l===1){a=1+rnd(9);b=1+rnd(9);t=`${a} + ${b}`;ans=a+b}
+ else if(l===2){a=10+rnd(40);b=2+rnd(20);if(rnd(2)){t=`${a} + ${b}`;ans=a+b}else{t=`${a} − ${b}`;ans=a-b}}
+ else if(l===3){a=2+rnd(9);b=2+rnd(9);if(rnd(2)){t=`${a} × ${b}`;ans=a*b}else{a=20+rnd(60);b=10+rnd(40);t=`${a} + ${b}`;ans=a+b}}
+ else if(l===4){a=3+rnd(10);b=3+rnd(10);const c=2+rnd(15);t=`${a} × ${b} − ${c}`;ans=a*b-c}
+ else{a=6+rnd(10);b=4+rnd(10);const c=10+rnd(40);t=`${a} × ${b} + ${c}`;ans=a*b+c}
+ const set=new Set([ans]);
+ while(set.size<4){const d=(1+rnd(10))*(rnd(2)?1:-1);const w=rnd(3)?ans+d:ans+(rnd(2)?10:-10);if(w>=0&&w!==ans)set.add(w)}
+ return{kind:'m',id:t,html:`<div class="q">${t}</div>`,hint:'Solve it',opts:shuffle([...set]).map(v=>({label:v,val:v===ans}))};
+}
+function fresh(g){let q;for(let i=0;i<60;i++){q=g(S.level);if(!S.seen.has(q.id))break}S.seen.add(q.id);return q}
+const col=hex=>{const n=parseInt(hex.slice(1),16),r=(n>>16)/255,g=(n>>8&255)/255,b=(n&255)/255,mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn;let h=0;if(d){h=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;h=(h*60+360)%360}return[h,(mx+mn)/2]};
+const dist=(a,b)=>{const x=col(a),y=col(b);let dh=Math.abs(x[0]-y[0]);dh=Math.min(dh,360-dh);return dh/3+Math.abs(x[1]-y[1])*100};
+const nearest=(list,get,ref)=>shuffle(list.slice().sort((p,q)=>dist(get(p),ref)-dist(get(q),ref)).slice(0,5)).slice(0,3);
+function colorQ(l){
+ const hard=l>=3,pool=LV_POOL[Math.min(l,4)-1],k=pick(pool),[A,B]=k.split('+'),[name,hex]=MIX[k];
+ const reverse=hard&&rnd(2)===0;
+ if(!reverse){
+  const cand=Object.values(MIX).filter(v=>v[0]!==name);
+  const wrong=hard?nearest(cand,v=>v[1],hex):shuffle(cand).slice(0,3);
+  const opts=shuffle([[name,hex],...wrong]).map(v=>({label:v[0],sw:v[1],hide:hard,val:v[0]===name}));
+  return{kind:'c',id:k+'|f',html:`<div class="mix"><div class="sw" style="background:${BASE[A]}"></div>+<div class="sw" style="background:${BASE[B]}"></div>=<div class="sw q2">?</div></div>`,hint:hard?'Mix them':`${A} + ${B}`,opts};
+ }
+ const cand=Object.keys(BASE).filter(c=>c!==B&&c!==A&&(MIX[A+'+'+c]||MIX[c+'+'+A]||[])[0]!==name);
+ const wrong=nearest(cand,c=>BASE[c],BASE[B]);
+ const opts=shuffle([B,...wrong]).map(c=>({label:c,sw:BASE[c],hide:true,val:c===B}));
+ return{kind:'c',id:k+'|r',html:`<div class="mix"><div class="sw" style="background:${BASE[A]}"></div>+<div class="sw q2">?</div>=<div class="sw" style="background:${hex}"></div></div>`,hint:'Find the missing color',opts};
+}
+
+function home(){
+ app.innerHTML=`<div class="center"><h1><span>Math</span><br><span>Color</span></h1>
+ <p>Every turn gives you a math question and a color mix at the same time. Answer both before the clock runs out. Five turns per level, 15 seconds each. Every level gets faster and harder.</p>
+ <p>Best score: <b>${best()}</b></p><button class="btn" id="go">Start game</button></div>`;
+ $('#go').onclick=()=>{S={level:1,turn:0,score:0,lives:3,streak:0,correct:0,seen:new Set()};next()};
+}
+function next(){
+ S.turn++;
+ if(S.turn>5){return levelDone()}
+ if(S.turn===1)S.hist=[];
+ S.qs=[fresh(mathQ),fresh(colorQ)];S.res=[null,null];
+ S.limit=timeFor(S.level);S.start=performance.now();S.locked=false;
+ const dots=[1,2,3,4,5].map(i=>`<i class="${i<S.turn?(S.hist[i-1]?'done':'fail'):i===S.turn?'on':''}"></i>`).join('');
+ const panel=(q,p)=>`<div class="panel ${q.kind}" id="p${p}"><section class="stage" id="st${p}"><span class="tag ${q.kind}">${q.kind==='m'?'Logic':'Color'}</span>${q.html}<div class="hint">${q.hint}</div></section>
+ <div class="grid" id="g${p}">${q.opts.map((o,i)=>`<button class="opt" data-p="${p}" data-i="${i}" aria-label="${o.label}">${o.sw?`<span class="sw" style="background:${o.sw}"></span>${o.hide?'':`<small>${o.label}</small>`}`:o.label}</button>`).join('')}</div></div>`;
+ app.innerHTML=`<div class="top"><span class="pill">Level ${S.level}</span><div class="dots" id="dots" aria-label="Turn ${S.turn} of 5">${dots}</div><span class="pill" style="color:var(--bad)">${S.lives>5?'♥ ×'+S.lives:'♥'.repeat(S.lives)||'–'}</span></div>
+ <div class="bar" id="bar"><b id="fill"></b></div>
+ <div class="panels">${panel(S.qs[0],0)}${panel(S.qs[1],1)}</div>
+ <div class="top"><span class="pill">Score ${S.score}</span><span class="pill">Streak ${S.streak}</span></div><div class="tip">Answer both before time runs out.</div>`;
+ document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>answer(+b.dataset.p,+b.dataset.i));
+ cancelAnimationFrame(S.raf);tick();
+}
+function tick(){
+ const left=Math.max(0,S.limit-(performance.now()-S.start)/1000),f=$('#fill');
+ if(!f)return;
+ f.style.transform=`scaleX(${left/S.limit})`;
+ f.style.background=`hsl(${Math.round(120*left/S.limit)} 85% 45%)`;
+ if(left<=0&&!S.locked)return finish();
+ if(!S.locked)S.raf=requestAnimationFrame(tick);
+}
+function answer(p,i){
+ if(S.locked||S.res[p]!==null)return;
+ const left=Math.max(0,S.limit-(performance.now()-S.start)/1000);
+ S.res[p]={i,ok:S.qs[p].opts[i].val,left};
+ const g=$('#g'+p);g.classList.add('lock');g.children[i].classList.add('pick');$('#p'+p).classList.add('done');
+ if(S.res[0]&&S.res[1])finish();
+}
+function finish(){
+ if(S.locked)return;S.locked=true;cancelAnimationFrame(S.raf);
+ let allOk=true;
+ [0,1].forEach(p=>{
+  const r=S.res[p],g=$('#g'+p);g.classList.add('lock');
+  S.qs[p].opts.forEach((x,j)=>{if(x.val)g.children[j].classList.add('ok')});
+  if(r&&r.ok){S.score+=50*S.level+Math.round(r.left*5);S.correct++}
+  else{allOk=false;if(r)g.children[r.i].classList.add('bad')}
+ });
+ S.hist[S.turn-1]=allOk;$('#dots').children[S.turn-1].className=allOk?'done':'fail';
+ if(allOk){S.streak++;S.score+=Math.min(S.streak,5)*20}
+ else{S.streak=0;S.lives--;document.querySelector('.panels').classList.add('shake')}
+ setTimeout(()=>S.lives<=0?over():next(),allOk?700:1400);
+}
+function levelDone(){
+ const perfect=S.hist.every(Boolean);S.lives++;
+ const praise=perfect?pick(['Flawless! Both sides of your brain were in sync.','Perfect level! Left and right brain, working as a team.','Not a single slip. Impressive!']):pick(['You pushed through! Mistakes are just practice.','Solid work. Your brain is warming up.','Level cleared. Two sides, one great team.']);
+ app.innerHTML=`<div class="center"><div class="big">Level ${S.level} done</div><p>${praise}</p><div class="bonus">\u2665 +1 extra life<span>You now have ${S.lives}. Use them wisely!</span></div><p>Score ${S.score}. Next up: ${timeFor(S.level+1).toFixed(1)} seconds per turn and tougher questions.</p><button class="btn" id="nx">Start level ${S.level+1}</button></div>`;
+ $('#nx').onclick=()=>{S.level++;S.turn=0;next()};
+}
+function over(){
+ const b=best(),nb=S.score>b;if(nb)saveBest(S.score);
+ app.innerHTML=`<div class="center">${nb?'<div class="rec">\U0001F3C6 NEW RECORD!</div>':''}<div class="big" id="sc">0</div><p>${nb?(b?`You beat your old best of ${b}. Incredible!`:'Your first score on the board. Now beat it!'):`Best score: ${b}.`} You reached level ${S.level} with ${S.correct} correct answers.</p><button class="btn" id="again">Play again</button></div>`;
+ $('#again').onclick=home;
+ countUp($('#sc'),S.score);
+ if(nb){burst(.2);burst(.8);setTimeout(()=>burst(.5),500);setTimeout(()=>{burst(.3);burst(.7)},1100);setTimeout(()=>burst(.5),1800)}
+}
+function countUp(el,v){const t0=performance.now();(function f(n){const k=Math.min(1,(n-t0)/1100);el.textContent=Math.round(v*(1-Math.pow(1-k,3)));if(k<1)requestAnimationFrame(f)})(t0)}
+let P=[],run=false;
+function burst(ox){
+ if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+ const c=$('#cf');if(c.width!==innerWidth||c.height!==innerHeight){c.width=innerWidth;c.height=innerHeight}
+ const cols=['#ff5a3c','#ffd23f','#2fb344','#3b5bff','#8a3ffc','#ff9ec4'];
+ for(let i=0;i<90;i++)P.push({x:innerWidth*ox,y:innerHeight*.55,vx:(Math.random()-.5)*18,vy:-Math.random()*18-6,w:Math.random()*8+5,h:Math.random()*5+3,c:cols[rnd(cols.length)],a:Math.random()*6,va:(Math.random()-.5)*.4});
+ if(!run){run=true;const x=c.getContext('2d');(function f(){x.clearRect(0,0,c.width,c.height);P=P.filter(p=>p.y<innerHeight+40);P.forEach(p=>{p.vy+=.35;p.vx*=.99;p.x+=p.vx;p.y+=p.vy;p.a+=p.va;x.save();x.translate(p.x,p.y);x.rotate(p.a);x.fillStyle=p.c;x.fillRect(-p.w/2,-p.h/2,p.w,p.h);x.restore()});if(P.length)requestAnimationFrame(f);else run=false})()}
+}
+home();
+function setTheme(t){document.documentElement.setAttribute('data-theme',t);$('#theme').textContent=t==='dark'?'Light mode':'Dark mode';try{localStorage.setItem('bs-theme',t)}catch(e){}}
+let saved='light';try{saved=localStorage.getItem('bs-theme')||'light'}catch(e){}
+setTheme(saved);
+$('#theme').onclick=()=>setTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');
+</script>
+</body>
+</html>
