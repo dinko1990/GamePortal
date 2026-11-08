@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Game Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&display=swap" rel="stylesheet">
+<script>try{var t=localStorage.getItem('bs-theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<style>
+:root{--bg:#fbf7ee;--card:#fffdf8;--ink:#2a2620;--mute:#7a7364;--line:#ece4d2;--logic:#3b5bff;--logic2:#e9edfb;--color:#ff5a3c;--color2:#fdebdd;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12111d;--card:#1c1b2c;--ink:#f1f0fa;--mute:#9a98b5;--line:#2e2c46;--logic:#7b93ff;--logic2:#252a55;--color:#ff8366;--color2:#4a2a25;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#12111d;--card:#1c1b2c;--ink:#f1f0fa;--mute:#9a98b5;--line:#2e2c46;--logic:#7b93ff;--logic2:#252a55;--color:#ff8366;--color2:#4a2a25;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);font-family:'Bricolage Grotesque',system-ui,-apple-system,Segoe UI,sans-serif;display:flex;justify-content:center;transition:background .4s}
+main{width:100%;max-width:880px;padding:calc(24px + env(safe-area-inset-top,0px)) 14px calc(84px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:22px}
+.hero{text-align:center;padding:24px 0 4px;display:flex;flex-direction:column;align-items:center;gap:14px}
+h1{font-size:clamp(44px,14vw,68px);margin:0;letter-spacing:-.03em;line-height:.95;font-weight:800}
+h1 span:first-child{color:var(--logic)} h1 span:last-child{color:var(--color)}
+p{margin:0;color:var(--mute);max-width:36ch;line-height:1.45}
+.pill{font:inherit;font-weight:700;font-size:14px;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:99px;padding:6px 14px;cursor:default}
+#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+a.game{display:flex;flex-direction:column;justify-content:space-between;gap:18px;min-height:140px;padding:16px;background:var(--card);border:2px solid var(--line);border-radius:22px;color:var(--ink);text-decoration:none;transition:transform .12s,border-color .12s}
+a.game:hover{border-color:var(--ink)} a.game:active{transform:scale(.97)}
+a.game:focus-visible,.themebtn:focus-visible{outline:3px solid var(--logic);outline-offset:2px}
+.sw{width:44px;height:44px;border-radius:50%;border:3px solid var(--card);box-shadow:0 0 0 1px var(--line)}
+.name{font-weight:800;font-size:20px;letter-spacing:-.01em;line-height:1.1;overflow-wrap:anywhere}
+.msg{grid-column:1/-1;text-align:center;color:var(--mute);line-height:1.6}
+code{background:var(--logic2);color:var(--logic);border-radius:6px;padding:1px 6px}
+.themebtn{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));cursor:pointer}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<button class="pill themebtn" id="theme" type="button"></button>
+<main>
+  <div class="hero">
+    <h1><span>Game</span><br><span>Portal</span></h1>
+    <p>Small games, one tap away. Pick one and play.</p>
+    <span class="pill"><b id="count">0</b> games</span>
+  </div>
+  <div id="grid"><p class="msg">Loading games…</p></div>
+</main>
+<script src="games.js"></script>
+<script>
+const $=s=>document.querySelector(s), grid=$("#grid");
+const title=f=>f.replace(/\.html?$/i,"").replace(/[-_]+/g," ").replace(/\b\w/g,c=>c.toUpperCase());
+const hue=s=>{let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))%360;return h};
+
+async function listGames(){
+  if(Array.isArray(window.GAMES))return window.GAMES; // works on file:// too
+  try{const r=await fetch("games.json",{cache:"no-store"});if(r.ok)return await r.json()}catch(e){}
+  try{ // fallback: server directory listing
+    const r=await fetch("games/"),doc=new DOMParser().parseFromString(await r.text(),"text/html");
+    return [...doc.querySelectorAll("a")].map(a=>decodeURIComponent(a.getAttribute("href")))
+      .filter(h=>/\.html?$/i.test(h)).map(h=>h.split("/").pop());
+  }catch(e){}
+  return null;
+}
+listGames().then(files=>{
+  grid.innerHTML="";
+  if(!files||!files.length){
+    grid.innerHTML='<p class="msg">No games found.<br>Put <code>.html</code> files in <code>games/</code> and run <code>python scan.py</code>.</p>';
+    return;
+  }
+  $("#count").textContent=files.length;
+  for(const f of files){
+    const a=document.createElement("a");
+    a.className="game";a.href="games/"+encodeURIComponent(f);
+    const sw=document.createElement("span");sw.className="sw";
+    sw.style.background=`hsl(${hue(f)} 85% 62%)`;
+    const n=document.createElement("span");n.className="name";n.textContent=title(f);
+    a.append(sw,n);grid.appendChild(a);
+  }
+});
+
+function setTheme(t){document.documentElement.setAttribute("data-theme",t);
+  $("#theme").textContent=t==="dark"?"Light mode":"Dark mode";try{localStorage.setItem("bs-theme",t)}catch(e){}}
+let saved=null;try{saved=localStorage.getItem("bs-theme")}catch(e){}
+setTheme(saved||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"));
+$("#theme").onclick=()=>setTheme(document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark");
+</script>
+</body>
+</html>
