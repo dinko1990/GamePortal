@@ -18,14 +18,16 @@ button.on{background:var(--color);border-color:var(--color);color:#fff}
 canvas{touch-action:none;background:var(--card);border:3px solid var(--ink);border-radius:18px;max-width:94vw;height:auto}
 .hud{font-weight:800;display:flex;gap:10px;align-items:center}
 .tip{font-size:14px;color:var(--mute)}
-#dpad{display:grid;grid-template-columns:repeat(3,68px);gap:8px}
-#dpad button{height:56px;font-size:22px;border-radius:18px;padding:0}
-#dpad .u{grid-column:2}
+#dpad{display:grid;grid-template-columns:repeat(3,78px);grid-template-rows:68px 68px;gap:10px;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+#dpad button{height:100%;font-size:28px;border-radius:20px;padding:0}
+#dpad .u{grid-area:1/2}#dpad .l{grid-area:2/1}#dpad .d{grid-area:2/2}#dpad .r{grid-area:2/3}
+.ver{font-size:12px;color:var(--mute);opacity:.7}
 </style></head><body>
 <div class="hud"><a href="../index.html">← Portal</a><span>Score <span id="s">0</span></span></div>
 <canvas id="c" width="400" height="400"></canvas>
 <div class="tip">Swipe, arrow keys or WASD</div>
-<div id="dpad"><button class="u" data-x="0" data-y="-1" aria-label="Up">▲</button><button data-x="-1" data-y="0" aria-label="Left">◀</button><button data-x="0" data-y="1" aria-label="Down">▼</button><button data-x="1" data-y="0" aria-label="Right">▶</button></div>
+<div id="dpad"><button class="u" data-x="0" data-y="-1" aria-label="Up">▲</button><button class="l" data-x="-1" data-y="0" aria-label="Left">◀</button><button class="d" data-x="0" data-y="1" aria-label="Down">▼</button><button class="r" data-x="1" data-y="0" aria-label="Right">▶</button></div>
+<div class="ver">v1.1</div>
 <script>
 const V=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const c=document.getElementById("c"),x=c.getContext("2d"),N=20,S=20;
@@ -52,6 +54,6 @@ c.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;ty=e.touches[0].clie
 c.addEventListener("touchend",e=>{const t=e.changedTouches[0],dx=t.clientX-tx,dy=t.clientY-ty;
  if(Math.max(Math.abs(dx),Math.abs(dy))<20)return;
  Math.abs(dx)>Math.abs(dy)?turn(Math.sign(dx),0):turn(0,Math.sign(dy));});
-document.querySelectorAll("#dpad button").forEach(b=>b.onclick=()=>turn(+b.dataset.x,+b.dataset.y));
+document.querySelectorAll("#dpad button").forEach(b=>b.addEventListener("pointerdown",e=>{e.preventDefault();turn(+b.dataset.x,+b.dataset.y)}));
 reset();
 </script></body></html>
