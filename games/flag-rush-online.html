@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Flag Rush — Flags & Country Shapes</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&display=swap" rel="stylesheet">
+<script>try{const t=localStorage.getItem('bs-theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<style>
+:root{--bg:#fbf7ee;--card:#fffdf8;--ink:#2a2620;--mute:#7a7364;--line:#ece4d2;--logic:#3b5bff;--logic2:#e9edfb;--color:#ff5a3c;--color2:#fdebdd;--ok:#13a36b;--bad:#e5384f;color-scheme:light}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12111d;--card:#1c1b2c;--ink:#f1f0fa;--mute:#9a98b5;--line:#2e2c46;--logic:#7b93ff;--logic2:#252a55;--color:#ff8366;--color2:#4a2a25;--ok:#32d296;--bad:#ff6b80;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#12111d;--card:#1c1b2c;--ink:#f1f0fa;--mute:#9a98b5;--line:#2e2c46;--logic:#7b93ff;--logic2:#252a55;--color:#ff8366;--color2:#4a2a25;--ok:#32d296;--bad:#ff6b80;color-scheme:dark}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}body{margin:0;background:var(--bg);color:var(--ink);font-family:'Bricolage Grotesque',system-ui,sans-serif;min-height:100dvh;display:flex;justify-content:center}main{width:min(100%,580px);padding:calc(16px + env(safe-area-inset-top)) 16px calc(32px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:14px}
+a,button{font:inherit}button{cursor:pointer;background:var(--card);color:var(--ink);border:2px solid var(--line);border-radius:16px;padding:12px 14px;font-weight:800}button:disabled{cursor:not-allowed;opacity:.55}button:focus-visible,a:focus-visible{outline:3px solid var(--logic);outline-offset:3px}a{color:var(--logic);text-decoration:none}.top{display:flex;align-items:center;justify-content:space-between;gap:10px}.back{font-size:14px;font-weight:700}.theme{border-radius:99px;padding:7px 12px;font-size:13px}.hero{text-align:center}.hero h1{font-size:clamp(45px,12vw,65px);letter-spacing:-.06em;line-height:1;margin:8px 0 4px}.hero h1 span{color:var(--color)}.subtitle{color:var(--mute);margin:0;font-size:14px}.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.modes button{padding:10px 3px;font-size:clamp(12px,3vw,15px);border-radius:14px}.modes .selected{border-color:var(--logic);background:var(--logic2);color:var(--logic)}.modes .soon{opacity:.5}.panel{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:18px 16px}.setup{display:grid;gap:14px;text-align:center}.setup h2{margin:0;font-size:25px}.setup p{margin:0;color:var(--mute);line-height:1.5}.diffs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.diffs button{font-size:13px;border-radius:12px;padding:10px 4px}.diffs .chosen{background:var(--logic2);border-color:var(--logic);color:var(--logic)}.primary{background:var(--logic);color:white;border-color:var(--logic);font-size:18px}.hud{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}.stat{text-align:center;border:1px solid var(--line);border-radius:14px;background:var(--card);padding:8px 4px;min-width:0}.stat small{display:block;color:var(--mute);font-size:11px;font-weight:700}.stat strong{font-size:clamp(17px,5vw,25px);font-variant-numeric:tabular-nums}.hearts{letter-spacing:2px;color:var(--bad)!important;white-space:nowrap}.progress{height:9px;border-radius:9px;overflow:hidden;background:var(--line)}.progress>div{height:100%;background:var(--logic);width:100%;transition:width .15s linear}.progress.danger>div{background:var(--bad)}.flagStage{min-height:230px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px}.flagStage img{width:min(100%,320px);height:180px;object-fit:contain;filter:drop-shadow(0 5px 9px #0002)}.flagStage svg{width:min(100%,320px);max-height:180px;filter:drop-shadow(0 5px 9px #0002)}.flagStage .emoji{font-size:125px;line-height:1.2}.flagStage #flag{width:100%;display:grid;place-items:center;min-height:155px}.flagStage svg.country-shape{height:185px;width:min(100%,360px);max-height:none;filter:none}.loading-info{font-size:14px;color:var(--mute);text-align:center;max-width:32ch;line-height:1.5}.qmeta{font-size:12px;text-transform:uppercase;color:var(--mute);font-weight:800;letter-spacing:.07em}.feedback{min-height:24px;text-align:center;font-weight:800}.feedback.good{color:var(--ok)}.feedback.bad{color:var(--bad)}.choices{display:grid;grid-template-columns:1fr 1fr;gap:9px}.choices button{font-size:clamp(14px,3.6vw,18px);line-height:1.15;min-height:67px;padding:10px 7px}.choices button.right{background:color-mix(in srgb,var(--ok) 18%,var(--card));border-color:var(--ok)}.choices button.wrong{background:color-mix(in srgb,var(--bad) 18%,var(--card));border-color:var(--bad)}.choices.lock button{pointer-events:none}.end{text-align:center;display:grid;gap:12px}.end h2{font-size:38px;margin:0}.end .big{font-size:66px;font-weight:800;color:var(--logic)}.end p{margin:0;color:var(--mute)}.foot{font-size:12px;text-align:center;color:var(--mute);line-height:1.45}.hidden{display:none!important}@media(max-width:370px){.flagStage{min-height:185px}.flagStage img{height:145px}.flagStage svg{max-height:145px}.panel{padding:14px 12px}.choices button{min-height:58px}}@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head><body><main>
+<div class="top"><a class="back" href="../index.html">← Game Portal</a><button id="theme" class="theme" type="button">Theme</button></div>
+<header class="hero"><h1>Flag <span>Rush</span></h1><p class="subtitle">Current flags, historic flags & country shapes. Three hearts. One high score.</p></header>
+<nav class="modes" aria-label="Game mode"><button id="mode-current" class="selected" type="button">🌎 Current flags</button><button id="mode-old" type="button">🏛️ Old flags</button><button id="mode-shapes" type="button">🗺️ Country shapes</button></nav>
+<section id="setup" class="panel setup"><h2 id="setup-title">Current flags</h2><p id="setup-description">Start with familiar countries, or challenge yourself with smaller ones.</p><div class="diffs"><button data-diff="easy" class="chosen">Easy</button><button data-diff="medium">Medium</button><button data-diff="hard">Hard</button></div><p id="detail">Population-based approximate tiers · 15 seconds per flag</p><div>Best score: <b id="setup-best">0</b></div><button class="primary" id="play">Start playing →</button></section>
+<section id="game" class="hidden"><div class="hud"><div class="stat"><small>SCORE</small><strong id="score">0</strong></div><div class="stat"><small>HEARTS</small><strong class="hearts" id="hearts">♥ ♥ ♥</strong></div><div class="stat"><small>TIME</small><strong id="time">15.0</strong></div></div><div class="progress" id="timerbar"><div id="timerfill"></div></div><div class="panel flagStage"><div class="qmeta" id="round">Flag 1 · Easy</div><div id="flag"></div><div class="feedback" id="feedback" aria-live="polite"></div></div><div class="choices" id="choices"></div></section>
+<section id="finish" class="panel end hidden"><h2>Run over!</h2><div class="big" id="finalscore">0</div><p id="finishtext"></p><p id="besttext"></p><button class="primary" id="retry">Play again →</button><button id="switch">Change mode / difficulty</button></section>
+<footer class="foot">Scores saved on this device · 3 hearts · Fast answers score more points.<br>Current flags use FlagCDN; historic flags use Wikimedia Commons; country shapes use Natural Earth GeoJSON. Shape and historic modes need internet. Sources and licensing vary by image.</footer>
+</main><script>
+const W=90,H=60;
+const rc=(x,y,w,h,f)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${f}"/>`;
+const ci=(x,y,r,f,ex="")=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${f}" ${ex}/>`;
+const poly=(pts,f)=>`<polygon points="${pts}" fill="${f}"/>`;
+const star=(cx,cy,r,f,rot=0)=>{const p=[];for(let i=0;i<10;i++){const a=(rot-90+i*36)*Math.PI/180,rr=i%2?r*.382:r;p.push((cx+rr*Math.cos(a)).toFixed(1)+","+(cy+rr*Math.sin(a)).toFixed(1));}return poly(p.join(" "),f)};
+const parts=s=>{const p=s.split(" ").map(t=>t.split(":"));const tot=p.reduce((a,t)=>a+(+t[1]||1),0);return p.map(t=>[t[0],(+t[1]||1)/tot])};
+const hs=(s,x=0)=>{let y=0;return parts(s).map(([c,w])=>{const h=w*H,r=rc(x,y,W-x,h+.3,c);y+=h;return r}).join("")};
+const vs=s=>{let x=0;return parts(s).map(([c,w])=>{const wd=w*W,r=rc(x,0,wd+.3,H,c);x+=wd;return r}).join("")};
+const cross=(bg,c,x,t)=>rc(0,0,W,H,bg)+rc(x,0,t,H,c)+rc(0,(H-t)/2,W,t,c);
+const small=[[19,11],[71,11],[19,49],[71,49]].map(([x,y])=>rc(x-1.8,y-5,3.6,10,"#FF0000")+rc(x-5,y-1.8,10,3.6,"#FF0000")).join("");
+const usa=(()=>{let o="";for(let i=0;i<13;i++)o+=rc(0,i*100/13,190,100/13+.3,i%2?"#fff":"#B22234");o+=rc(0,0,76,53.85,"#3C3B6E");
+  for(let r=0;r<9;r++){const n=r%2?5:6;for(let k=0;k<n;k++)o+=ci((r%2?12.67:6.33)+k*12.67,5.385*(r+1),1.7,"#fff");}return o})();
+const ven=Array.from({length:8},(_,i)=>{const a=(190+i*160/7)*Math.PI/180;return ci(45+13*Math.cos(a),38+13*Math.sin(a),1.7,"#fff")}).join("");
+const china=star(15,15,9,"#FFDE00")+[[30,6],[36,12],[36,21],[30,27]].map(([x,y])=>star(x,y,3,"#FFDE00",Math.atan2(15-y,15-x)*180/Math.PI+90)).join("");
+const wheel=Array.from({length:24},(_,i)=>{const a=i*15*Math.PI/180;return `<line x1="45" y1="30" x2="${(45+8*Math.cos(a)).toFixed(1)}" y2="${(30+8*Math.sin(a)).toFixed(1)}" stroke="#000080" stroke-width=".5"/>`}).join("");
+const uk='<clipPath id="s"><path d="M0,0 v30 h60 v-30 z"/></clipPath><clipPath id="t"><path d="M30,15 h30 v15 z v15 h-30 z h-30 v-15 z v-15 h30 z"/></clipPath><g clip-path="url(#s)"><path d="M0,0 v30 h60 v-30 z" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 L60,30 M60,0 L0,30" clip-path="url(#t)" stroke="#C8102E" stroke-width="4"/><path d="M30,0 v30 M0,15 h60" stroke="#fff" stroke-width="10"/><path d="M30,0 v30 M0,15 h60" stroke="#C8102E" stroke-width="6"/></g>';
+const FL=[
+["Germany",hs("#000 #DD0000 #FFCE00")],["Netherlands",hs("#AE1C28 #fff #21468B")],["Russia",hs("#fff #0039A6 #D52B1E")],
+["Austria",hs("#ED2939 #fff #ED2939")],["Hungary",hs("#CE2939 #fff #477050")],["Bulgaria",hs("#fff #00966E #D62612")],
+["Estonia",hs("#0072CE #000 #fff")],["Lithuania",hs("#FDB913 #006A44 #C1272D")],["Latvia",hs("#9E3039:2 #fff #9E3039:2")],
+["Ukraine",hs("#0057B7 #FFD700")],["Poland",hs("#fff #DC143C")],["Indonesia",hs("#CE1126 #fff")],["Armenia",hs("#D90012 #0033A0 #F2A800")],
+["Colombia",hs("#FCD116:2 #003893 #CE1126")],["Spain",hs("#AA151B #F1BF00:2 #AA151B")],
+["Thailand",hs("#A51931 #F4F5F8 #2D2A4A:2 #F4F5F8 #A51931")],
+["France",vs("#0055A4 #fff #EF4135")],["Italy",vs("#009246 #fff #CE2B37")],["Ireland",vs("#169B62 #fff #FF883E")],
+["Belgium",vs("#000 #FAE042 #ED2939")],["Romania",vs("#002B7F #FCD116 #CE1126")],["Nigeria",vs("#008751 #fff #008751")],["Peru",vs("#D91023 #fff #D91023")],
+["Japan",rc(0,0,W,H,"#fff")+ci(45,30,18,"#BC002D")],["Bangladesh",rc(0,0,W,H,"#006A4E")+ci(40,30,18,"#F42A41")],
+["Sweden",cross("#006AA7","#FECC00",26,10)],["Denmark",cross("#C8102E","#fff",26,8)],["Finland",cross("#fff","#003580",24,12)],
+["Norway",cross("#BA0C2F","#fff",24,14)+rc(28,0,6,H,"#00205B")+rc(0,27,W,6,"#00205B")],
+["Iceland",cross("#02529C","#fff",24,14)+rc(28,0,6,H,"#DC1E35")+rc(0,27,W,6,"#DC1E35")],
+["Switzerland",rc(0,0,60,60,"#DA291C")+rc(25,10,10,40,"#fff")+rc(10,25,40,10,"#fff"),"0 0 60 60"],
+["United Kingdom",uk,"0 0 60 30"],
+["Georgia",rc(0,0,W,H,"#fff")+rc(37,0,16,H,"#FF0000")+rc(0,22,W,16,"#FF0000")+small],
+["Israel",rc(0,0,W,H,"#fff")+rc(0,6,W,6,"#0038B8")+rc(0,48,W,6,"#0038B8")+'<polygon points="45,16 57.1,37 32.9,37" fill="none" stroke="#0038B8" stroke-width="2.2"/><polygon points="45,44 32.9,23 57.1,23" fill="none" stroke="#0038B8" stroke-width="2.2"/>'],
+["United States",usa,"0 0 190 100"],
+["Brazil",rc(0,0,W,H,"#009C3B")+poly("45,6 84,30 45,54 6,30","#FFDF00")+ci(45,30,13,"#002776")+'<path d="M33 27 Q45 22 57 33" stroke="#fff" fill="none" stroke-width="2.5"/>'],
+["China",rc(0,0,W,H,"#DE2910")+china],["Vietnam",rc(0,0,W,H,"#DA251D")+star(45,31,18,"#FFFF00")],
+["India",hs("#FF9933 #fff #138808")+ci(45,30,8,"none",'stroke="#000080" stroke-width="1.2"')+wheel],
+["Cuba",hs("#002A8F #fff #002A8F #fff #002A8F")+poly("0,0 0,60 52,30","#CB1515")+star(17,30,10,"#fff")],
+["Jamaica",rc(0,0,W,H,"#009B3A")+poly("0,0 0,60 45,30","#000")+poly("90,0 90,60 45,30","#000")+'<path d="M0 0L90 60M90 0L0 60" stroke="#FED100" stroke-width="9"/>'],
+["Ghana",hs("#CE1126 #FCD116 #006B3F")+star(45,30,10,"#000")],
+["Kuwait",hs("#007A3D #fff #CE1126")+poly("0,0 22,20 22,40 0,60","#000")],
+["United Arab Emirates",hs("#00732F #fff #000",22)+rc(0,0,22,H,"#FF0000")],
+["Czechia",hs("#fff #D7141A")+poly("0,0 0,60 45,30","#11457E")],
+["Chile",hs("#fff #D52B1E")+rc(0,0,30,30,"#0039A6")+star(15,15,8,"#fff")],
+["Argentina",hs("#74ACDF #fff #74ACDF")+ci(45,30,5.5,"#F6B40E")],
+["Venezuela",hs("#FFCC00 #00247D #CF142B")+ven],
+["Ethiopia",hs("#078930 #FCDD09 #DA121A")+ci(45,30,12,"#0F47AF")+star(45,30,8,"#FCDD09")]
+];
+/*END*/
+/* All countries: shown as emoji flags (just 2 letters of text each - no pictures). Windows can't draw flag emoji by itself,
+   so the game checks; if they don't show, it falls back to the hand-drawn flags above (FL) until ../fonts/TwemojiCountryFlags.woff2 is added. */
+const ALL="af Afghanistan|al Albania|dz Algeria|ad Andorra|ao Angola|ag Antigua and Barbuda|ar Argentina|am Armenia|au Australia|at Austria|az Azerbaijan|bs Bahamas|bh Bahrain|bd Bangladesh|bb Barbados|by Belarus|be Belgium|bz Belize|bj Benin|bt Bhutan|bo Bolivia|ba Bosnia and Herzegovina|bw Botswana|br Brazil|bn Brunei|bg Bulgaria|bf Burkina Faso|bi Burundi|cv Cabo Verde|kh Cambodia|cm Cameroon|ca Canada|cf Central African Republic|td Chad|cl Chile|cn China|co Colombia|km Comoros|cg Congo (Republic)|cd DR Congo|cr Costa Rica|hr Croatia|cu Cuba|cy Cyprus|cz Czechia|dk Denmark|dj Djibouti|dm Dominica|do Dominican Republic|ec Ecuador|eg Egypt|sv El Salvador|gq Equatorial Guinea|er Eritrea|ee Estonia|sz Eswatini|et Ethiopia|fj Fiji|fi Finland|fr France|ga Gabon|gm Gambia|ge Georgia|de Germany|gh Ghana|gr Greece|gd Grenada|gt Guatemala|gn Guinea|gw Guinea-Bissau|gy Guyana|ht Haiti|hn Honduras|hu Hungary|is Iceland|in India|id Indonesia|ir Iran|iq Iraq|ie Ireland|il Israel|it Italy|ci Ivory Coast|jm Jamaica|jp Japan|jo Jordan|kz Kazakhstan|ke Kenya|ki Kiribati|xk Kosovo|kw Kuwait|kg Kyrgyzstan|la Laos|lv Latvia|lb Lebanon|ls Lesotho|lr Liberia|ly Libya|li Liechtenstein|lt Lithuania|lu Luxembourg|mg Madagascar|mw Malawi|my Malaysia|mv Maldives|ml Mali|mt Malta|mh Marshall Islands|mr Mauritania|mu Mauritius|mx Mexico|fm Micronesia|md Moldova|mc Monaco|mn Mongolia|me Montenegro|ma Morocco|mz Mozambique|mm Myanmar|na Namibia|nr Nauru|np Nepal|nl Netherlands|nz New Zealand|ni Nicaragua|ne Niger|ng Nigeria|kp North Korea|mk North Macedonia|no Norway|om Oman|pk Pakistan|pw Palau|ps Palestine|pa Panama|pg Papua New Guinea|py Paraguay|pe Peru|ph Philippines|pl Poland|pt Portugal|qa Qatar|ro Romania|ru Russia|rw Rwanda|kn Saint Kitts and Nevis|lc Saint Lucia|vc Saint Vincent and the Grenadines|ws Samoa|sm San Marino|st Sao Tome and Principe|sa Saudi Arabia|sn Senegal|rs Serbia|sc Seychelles|sl Sierra Leone|sg Singapore|sk Slovakia|si Slovenia|sb Solomon Islands|so Somalia|za South Africa|kr South Korea|ss South Sudan|es Spain|lk Sri Lanka|sd Sudan|sr Suriname|se Sweden|ch Switzerland|sy Syria|tw Taiwan|tj Tajikistan|tz Tanzania|th Thailand|tl Timor-Leste|tg Togo|to Tonga|tt Trinidad and Tobago|tn Tunisia|tr Turkey|tm Turkmenistan|tv Tuvalu|ug Uganda|ua Ukraine|ae United Arab Emirates|gb United Kingdom|us United States|uy Uruguay|uz Uzbekistan|vu Vanuatu|va Vatican City|ve Venezuela|vn Vietnam|ye Yemen|zm Zambia|zw Zimbabwe".split("|").map(t=>{const i=t.indexOf(" ");return[t.slice(i+1),t.slice(0,i)]});
+
+const $=s=>document.querySelector(s);
+const easyNames=`India|China|United States|Indonesia|Pakistan|Nigeria|Brazil|Bangladesh|Russia|Ethiopia|Mexico|Japan|Egypt|Philippines|DR Congo|Vietnam|Iran|Turkey|Germany|Thailand|United Kingdom|France|Italy|South Africa|Tanzania|Myanmar|Kenya|South Korea|Colombia|Spain|Argentina|Algeria|Sudan|Uganda|Ukraine|Iraq|Poland|Canada|Morocco|Saudi Arabia`.split('|');
+const mediumNames=`Uzbekistan|Peru|Angola|Malaysia|Mozambique|Ghana|Yemen|Nepal|Venezuela|Madagascar|Ivory Coast|Cameroon|Australia|North Korea|Niger|Sri Lanka|Burkina Faso|Mali|Syria|Malawi|Zambia|Kazakhstan|Chad|Somalia|Senegal|Zimbabwe|Guinea|Rwanda|Benin|Burundi|Bolivia|Tunisia|South Sudan|Belgium|Haiti|Jordan|Dominican Republic|Cuba|Honduras|Czechia|Sweden|Portugal|Azerbaijan|Greece|Hungary|Tajikistan|Belarus|United Arab Emirates|Israel|Austria|Switzerland|Sierra Leone|Togo|Laos|Kyrgyzstan|Paraguay|Serbia|Nicaragua|Libya|Bulgaria|Lebanon|El Salvador|Turkmenistan|Singapore|Denmark|Finland|Norway|Slovakia|Ireland|New Zealand`.split('|');
+const easySet=new Set(easyNames), mediumSet=new Set(mediumNames);
+const flagLookup=new Map(FL.map(x=>[x[0],x]));
+const currentCountries=ALL.map(([name,code])=>({name,code,svg:flagLookup.get(name)||null}));
+// Wikimedia Commons: historical examples, deliberately one country per entry to avoid answer ambiguity.
+// Each image is loaded before the timer starts. Failed remote images are skipped without costing a heart.
+const oldFlags=[
+ {name:'Libya',period:'1977–2011',file:'Flag of Libya (1977–2011).svg'},
+ {name:'Rwanda',period:'1961–2001',file:'Flag of Rwanda (1961–2001).svg'},
+ {name:'Germany',period:'1949–1990 (East Germany)',file:'Flag of East Germany.svg'},
+ {name:'Yugoslavia',period:'1946–1992',file:'Flag of Yugoslavia (1946-1992).svg'},
+ {name:'Soviet Union',period:'1923–1991',file:'Flag of the Soviet Union.svg'},
+ {name:'Czechoslovakia',period:'1920–1992',file:'Flag of Czechoslovakia.svg'},
+ {name:'Zaire',period:'1971–1997',file:'Flag of Zaire.svg'},
+ {name:'South Vietnam',period:'1948–1975',file:'Flag of South Vietnam.svg'},
+ {name:'Rhodesia',period:'1968–1979',file:'Flag of Rhodesia (1968–1979).svg'},
+ {name:'South Africa',period:'1928–1994',file:'Flag of South Africa (1928–1994).svg'},
+ {name:'Myanmar',period:'1974–2010',file:'Flag of Myanmar (1974–2010).svg'},
+ {name:'Iraq',period:'1991–2004',file:'Flag of Iraq (1991–2004).svg'},
+ {name:'Afghanistan',period:'2004–2013',file:'Flag of Afghanistan (2004–2013).svg'},
+ {name:'Iran',period:'1964–1979',file:'Flag of Iran (1964–1980).svg'},
+ {name:'Cambodia',period:'1979–1989',file:'Flag of the People’s Republic of Kampuchea.svg'},
+ {name:'Georgia',period:'1990–2004',file:'Flag of Georgia (1990–2004).svg'},
+ {name:'Malawi',period:'2010–2012',file:'Flag of Malawi (2010–2012).svg'},
+ {name:'Ethiopia',period:'1975–1987',file:'Flag of Ethiopia (1975–1987).svg'},
+ {name:'Belarus',period:'1991–1995',file:'Flag of Belarus (1991–1995).svg'},
+ {name:'Kazakhstan',period:'1992 (early design)',file:'Flag of Kazakhstan (1992).svg'},
+ {name:'Venezuela',period:'1930–2006',file:'Flag of Venezuela (1930–2006).svg'},
+ {name:'Canada',period:'1957–1965',file:'Canadian Red Ensign (1957–1965).svg'},
+ {name:'France',period:'1814–1830 (Bourbon Restoration)',file:'Flag of France (1814–1830).svg'},
+ {name:'Italy',period:'1861–1946 (Kingdom of Italy)',file:'Flag of Italy (1861–1946).svg'}
+];
+const commonsFile=file=>'https://commons.wikimedia.org/wiki/Special:FilePath/'+encodeURIComponent(file)+'?width=600';
+// Geography: Natural Earth public-domain boundaries; GeoJSON is fetched once per tab.
+const GEO_URL='https://cdn.jsdelivr.net/gh/datasets/geo-countries@main/data/countries.geojson';
+let shapesByCode=new Map(), shapesLoad=null, badHistorical=new Set();
+async function loadShapes(){
+ if(shapesByCode.size)return;
+ if(!shapesLoad)shapesLoad=(async()=>{
+  const ctrl=new AbortController(), timeout=setTimeout(()=>ctrl.abort(),35000);
+  try{
+   const res=await fetch(GEO_URL,{signal:ctrl.signal});if(!res.ok)throw Error('Map data HTTP '+res.status);
+   const data=await res.json();const out=new Map();
+   for(const f of data.features||[]){const code=(f.properties||{})['ISO3166-1-Alpha-2'];if(code&&code!=='-99'&&f.geometry)out.set(code.toLowerCase(),f.geometry)}
+   if(out.size<100)throw Error('Country boundaries were incomplete');shapesByCode=out;
+  }finally{clearTimeout(timeout)}
+ })().catch(e=>{shapesLoad=null;throw e});
+ return shapesLoad;
+}
+function shapeMarkup(geom){
+ const polygons=geom.type==='Polygon'?[geom.coordinates]:geom.type==='MultiPolygon'?geom.coordinates:[];
+ if(!polygons.length)return '<div class="loading-info">Shape unavailable</div>';
+ let raw=[];for(const poly of polygons)for(const ring of poly)for(const pt of ring)if(Number.isFinite(pt[0])&&Number.isFinite(pt[1]))raw.push(pt);
+ if(!raw.length)return '<div class="loading-info">Shape unavailable</div>';
+ // Correct geometry crossing the international date line when that reduces the country extent.
+ let xs=raw.map(p=>p[0]);const range=a=>{let lo=Infinity,hi=-Infinity;for(const v of a){if(v<lo)lo=v;if(v>hi)hi=v}return hi-lo};if(range(xs)>180){const shifted=xs.map(v=>v<0?v+360:v);if(range(shifted)<range(xs))xs=shifted}
+ const shift=xs.some((v,i)=>v!==raw[i][0]);
+ const lons=raw.map((p,i)=>xs[i]);const lats=raw.map(p=>p[1]);
+ const ext=a=>{let lo=Infinity,hi=-Infinity;for(const v of a){if(v<lo)lo=v;if(v>hi)hi=v}return[lo,hi]};const [minX,maxX]=ext(lons),[minY,maxY]=ext(lats);
+ const ratio=Math.max(.18,Math.cos(((minY+maxY)/2)*Math.PI/180));
+ const width=Math.max(.001,(maxX-minX)*ratio),height=Math.max(.001,maxY-minY),pad=Math.max(width,height)*.07;
+ const paths=polygons.map(poly=>poly.map(ring=>ring.map((p,i)=>{
+  let x=p[0];if(shift&&x<0)x+=360;
+  const X=((x-minX)*ratio).toFixed(3),Y=(maxY-p[1]).toFixed(3);return (i?'L':'M')+X+','+Y;
+ }).join(' ')+'Z').join(' ')).join(' ');
+ return `<svg class="country-shape" viewBox="${-pad} ${-pad} ${width+2*pad} ${height+2*pad}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Country silhouette"><path d="${paths}" fill="var(--logic)" stroke="var(--ink)" stroke-width="${Math.max(.02,Math.min(width,height)*.007)}" fill-rule="evenodd" stroke-linejoin="round"/></svg>`;
+}
+const preloadImage=url=>new Promise(resolve=>{const img=new Image();let done=false;const finish=ok=>{if(done)return;done=true;clearTimeout(t);resolve(ok)};const t=setTimeout(()=>finish(false),5000);img.onload=()=>finish(true);img.onerror=()=>finish(false);img.src=url});
+let mode='current',difficulty='easy',session=null,timerId=null,nextId=null;
+const timeLimits={easy:15,medium:12,hard:9}, points={easy:100,medium:160,hard:240};
+function storeKey(){return 'flag-rush:best:v2:'+mode+':'+difficulty}
+function best(){try{return +(localStorage.getItem(storeKey())||0)}catch(e){return 0}}
+function setBest(n){try{localStorage.setItem(storeKey(),String(n))}catch(e){}}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function selectedPool(){if(mode==='old')return oldFlags;return currentCountries.filter(x=>difficulty==='easy'?easySet.has(x.name):difficulty==='medium'?mediumSet.has(x.name):!easySet.has(x.name)&&!mediumSet.has(x.name))}
+function updateSetup(){
+ $('#setup-title').textContent=mode==='current'?'Current flags':mode==='old'?'Old flags':'Country shapes';
+ $('#setup-description').textContent=mode==='current'?'Pick a difficulty based roughly on country population.':mode==='old'?'Identify historical national flags. The years are shown as a clue.':'Guess the country from its outline. Online map data downloads at the start.';
+ $('#detail').textContent=(mode==='current'?'Approximate population tiers':mode==='old'?'Historic flags · online image library':'Population tiers · online country outlines')+' · '+timeLimits[difficulty]+' seconds per round';
+ $('#setup-best').textContent=best();
+ document.querySelectorAll('[data-diff]').forEach(b=>b.classList.toggle('chosen',b.dataset.diff===difficulty));
+ $('#mode-current').classList.toggle('selected',mode==='current');$('#mode-old').classList.toggle('selected',mode==='old');$('#mode-shapes').classList.toggle('selected',mode==='shapes');
+}
+function clearTimers(){if(timerId!==null){clearInterval(timerId);timerId=null}if(nextId!==null){clearTimeout(nextId);nextId=null}}
+function scene(id){['setup','game','finish'].forEach(x=>$('#'+x).classList.toggle('hidden',x!==id))}
+async function begin(){
+ clearTimers();session=null;$('#play').disabled=true;
+ if(mode==='shapes'){
+  $('#detail').textContent='Loading country outlines from Natural Earth…';
+  try{await loadShapes()}catch(e){$('#detail').textContent='Could not load map shapes. Check your internet and tap Start again.';$('#play').disabled=false;return}
+ }
+ $('#play').disabled=false;
+ session={score:0,hearts:3,question:0,used:new Set(),last:null,locked:false,remaining:timeLimits[difficulty],start:0,endsAt:0,skipped:0};scene('game');newQuestion();
+}
+function chooseQuestion(){const pool=selectedPool();if(pool.length===0)return null;
+ let available=pool.filter(x=>!session.used.has(x.name) && (mode!=='shapes'||shapesByCode.has(x.code)) && (mode!=='old'||!badHistorical.has(x.file)));
+ if(!available.length){session.used.clear();available=pool.filter(x=>(mode!=='shapes'||shapesByCode.has(x.code)) && (mode!=='old'||!badHistorical.has(x.file)))}
+ if(available.length>1&&session.last)available=available.filter(x=>x.name!==session.last);
+ const q=available[Math.floor(Math.random()*available.length)];session.used.add(q.name);session.last=q.name;return q;
+}
+function flagMarkup(q){if(mode==='shapes')return shapeMarkup(shapesByCode.get(q.code));if(mode==='old')return `<img alt="Historical flag" src="${commonsFile(q.file)}">`;
+ const svg=q.svg?`<svg viewBox="${q.svg[2]||'0 0 90 60'}" role="img" aria-label="Flag">${q.svg[1]}</svg>`:'';
+ const fallback=svg||`<span class="emoji" role="img" aria-label="Flag">${String.fromCodePoint(...[...q.code.toUpperCase()].map(x=>127397+x.charCodeAt(0)))}</span>`;
+ // Offline SVG is used for handcrafted flags; otherwise CDN is attempted.
+ return q.svg?fallback:`<img alt="Flag to identify" src="https://flagcdn.com/w320/${q.code.toLowerCase()}.png" onerror="this.outerHTML=decodeURIComponent(this.dataset.fallback)" data-fallback="${encodeURIComponent(fallback)}">`;
+}
+async function newQuestion(){
+ if(!session||session.hearts<=0)return end();clearTimers();session.locked=true;session.remaining=timeLimits[difficulty];
+ let q=null;
+ // Preload each Wikimedia file before allowing answers or starting the clock.
+ for(let tries=0;tries<(mode==='old'?oldFlags.length:1);tries++){
+  q=chooseQuestion();if(!q)break;
+  if(mode!=='old')break;
+  $('#round').textContent='Loading historical flag…';$('#flag').innerHTML='<span class="loading-info">Loading historical flag from Wikimedia Commons…</span>';
+  if(await preloadImage(commonsFile(q.file)))break;
+  badHistorical.add(q.file);q=null;session.skipped++;
+ }
+ if(!session)return;
+ if(!q){$('#round').textContent='Images unavailable';$('#flag').innerHTML='<span class="loading-info">Could not load the historical flag images. Check your connection and try again.</span>';$('#choices').innerHTML='<button class="primary" style="grid-column:1/-1" id="backSetup">Back to menu</button>';$('#backSetup').onclick=backToSetup;return}
+ session.question++;session.q=q;session.locked=false;
+ $('#round').textContent=`${mode==='shapes'?'Shape':'Flag'} ${session.question} · ${difficulty[0].toUpperCase()+difficulty.slice(1)}${mode==='old'?' · '+q.period:''}`;
+ $('#flag').innerHTML=flagMarkup(q);$('#feedback').textContent='';$('#feedback').className='feedback';$('#choices').innerHTML='';$('#choices').className='choices';
+ const pool=mode==='old'?oldFlags:currentCountries;
+ const wrong=shuffle(pool.filter(x=>x.name!==q.name)).slice(0,3);
+ shuffle([q,...wrong]).forEach(a=>{const btn=document.createElement('button');btn.textContent=a.name;btn.type='button';btn.addEventListener('click',()=>answer(a.name,btn));$('#choices').appendChild(btn)});
+ updateHud();session.endsAt=performance.now()+session.remaining*1000;timerId=setInterval(tick,75);
+}
+function updateHud(){if(!session)return;$('#score').textContent=session.score;$('#hearts').textContent='♥ '.repeat(session.hearts).trim()+'♡ '.repeat(3-session.hearts).trim();$('#time').textContent=Math.max(0,session.remaining).toFixed(1);const fraction=Math.max(0,session.remaining/timeLimits[difficulty]);$('#timerfill').style.width=(fraction*100)+'%';$('#timerbar').classList.toggle('danger',fraction<.3)}
+function tick(){if(!session||session.locked)return;session.remaining=Math.max(0,(session.endsAt-performance.now())/1000);updateHud();if(session.remaining<=0)answer(null,null)}
+function answer(name,button){if(!session||session.locked)return;session.locked=true;clearInterval(timerId);timerId=null;
+ const ok=name===session.q.name;
+ if(ok){const gained=points[difficulty]+Math.ceil(session.remaining)*10;session.score+=gained;$('#feedback').textContent=`Correct! +${gained}`;$('#feedback').classList.add('good')}
+ else{session.hearts--;$('#feedback').textContent=(name===null?'Time’s up!':'Not quite!')+' '+session.q.name;$('#feedback').classList.add('bad')}
+ for(const b of $('#choices').children){b.disabled=true;if(b.textContent===session.q.name)b.classList.add('right');else if(b===button&&!ok)b.classList.add('wrong')}
+ updateHud();nextId=setTimeout(()=>session.hearts<=0?end():newQuestion(),ok?850:1500);
+}
+function end(){clearTimers();if(!session)return;const old=best();const record=session.score>old;if(record)setBest(session.score);$('#finalscore').textContent=session.score.toLocaleString();$('#finishtext').textContent=`${session.question} flags played · ${mode==='current'?'Current flags':mode==='old'?'Old flags':'Country shapes'} · ${difficulty}`;$('#besttext').textContent=record?'🏆 New personal best!':'Best: '+Math.max(old,session.score).toLocaleString();scene('finish')}
+function backToSetup(){clearTimers();session=null;scene('setup');updateSetup()}
+$('#play').onclick=begin;$('#retry').onclick=begin;$('#switch').onclick=backToSetup;
+$('#mode-current').onclick=()=>{mode='current';backToSetup()};$('#mode-old').onclick=()=>{mode='old';backToSetup()};$('#mode-shapes').onclick=()=>{mode='shapes';backToSetup()};
+document.querySelectorAll('[data-diff]').forEach(b=>b.onclick=()=>{difficulty=b.dataset.diff;updateSetup()});
+function setTheme(t){document.documentElement.dataset.theme=t;$('#theme').textContent=t==='dark'?'☀️ Light':'🌙 Dark';try{localStorage.setItem('bs-theme',t)}catch(e){}}
+setTheme(document.documentElement.dataset.theme||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'));
+$('#theme').onclick=()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');
+document.addEventListener('visibilitychange',()=>{if(!session||session.locked)return;if(document.hidden){session.remaining=Math.max(0,(session.endsAt-performance.now())/1000);clearInterval(timerId);timerId=null}else{session.endsAt=performance.now()+session.remaining*1000;timerId=setInterval(tick,75)}});
+updateSetup();
+</script></body></html>
