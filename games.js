@@ -1,1 +1,1 @@
-window.GAMES = ["snake.html", "sudoku.html", "brainsplit.html","wordboundaries.html"];
+window.GAMES = ["snake.html", "sudoku.html", "brainsplit.html","wordboundaries.html","Geo-rush.html"];
