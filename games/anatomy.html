@@ -1,0 +1,187 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Anatomy Quest 3D</title><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&display=swap" rel="stylesheet"><style>
+:root{--bg:#f5f3ed;--card:#fffefa;--ink:#222333;--muted:#77788a;--line:#e8e6de;--accent:#5b60f5;--pink:#ed636e;--ok:#0fa976}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:'Bricolage Grotesque',system-ui,sans-serif}button{font:inherit;cursor:pointer}main{max-width:1040px;margin:auto;padding:16px 14px 24px}.top{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:12px}.brand{font-size:23px;font-weight:800;letter-spacing:-.06em;margin-right:auto}.brand em{font-style:normal;color:var(--accent)}.chip{background:var(--card);border:1px solid var(--line);padding:8px 12px;border-radius:16px;font-size:14px;font-weight:700}.layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px}.viewer{position:relative;height:min(72vh,680px);min-height:430px;border:1px solid var(--line);border-radius:26px;overflow:hidden;background:radial-gradient(ellipse at 50% 33%,#fff 0%,#e8e9f3 70%,#dfe0ec 100%)}#scene{display:block;width:100%;height:100%;touch-action:none;cursor:grab}.viewer:active canvas{cursor:grabbing}.overlay{position:absolute;top:14px;left:14px;display:flex;gap:5px;pointer-events:none}.badge{font-size:12px;font-weight:800;letter-spacing:.06em;background:#ffffffd9;padding:8px 10px;border-radius:12px}.assist{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);padding:7px 12px;border-radius:30px;background:#ffffffcf;font-size:12px;color:#595b74;white-space:nowrap;pointer-events:none}.side{display:flex;flex-direction:column;gap:12px}.panel{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:17px}.eyebrow{text-transform:uppercase;font-size:11px;font-weight:800;letter-spacing:.11em;color:var(--muted)}.prompt{font-size:clamp(24px,3.2vw,35px);font-weight:800;line-height:1.08;letter-spacing:-.04em;margin:12px 0}.desc{font-size:13px;color:var(--muted);line-height:1.5;margin:5px 0}.status{min-height:24px;font-weight:800;font-size:16px}.ok{color:var(--ok)}.bad{color:var(--pink)}.progress{height:9px;background:#e8e8ef;border-radius:20px;overflow:hidden;margin-top:13px}.progress>div{height:100%;background:var(--accent);width:100%;transform-origin:left}.controls{display:flex;gap:6px;flex-wrap:wrap;margin-top:11px}.button{border:1px solid var(--line);border-radius:12px;padding:10px 13px;font-weight:800;background:#f6f6fa;color:var(--ink)}.button.active{background:var(--ink);color:white}.button.primary{background:var(--accent);border-color:var(--accent);color:white;width:100%;margin-top:10px}.heart{color:var(--pink);font-size:17px}.score{font-size:30px;font-weight:800}.minirow{display:flex;justify-content:space-between;align-items:center}.label{font-size:12px;color:var(--muted);font-weight:700}.screen{position:fixed;inset:0;z-index:40;background:#252441a9;display:grid;place-items:center;padding:16px}.modal{width:min(420px,95vw);background:var(--card);border-radius:27px;padding:30px;text-align:center;box-shadow:0 30px 90px #1112}.modal h1{font-size:45px;letter-spacing:-.06em;margin:8px 0}.modal p{line-height:1.5;color:var(--muted)}.modal .button{font-size:18px}.hidden{display:none!important}#confetti{pointer-events:none;position:fixed;inset:0;z-index:50}.footer{text-align:center;color:var(--muted);font-size:12px;margin:10px}.pulse{animation:pulse .5s}@keyframes pulse{50%{transform:scale(1.06)}}@media(max-width:740px){.layout{grid-template-columns:1fr}.viewer{height:53vh;min-height:320px}.side{display:grid;grid-template-columns:1fr 1fr}.panel:first-child{grid-column:1/-1}.prompt{font-size:27px}.top .chip{font-size:12px}.panel{padding:13px}}@media(max-width:460px){.side{grid-template-columns:1fr}.panel:first-child{grid-column:auto}.viewer{height:47vh}}@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+</style></head><body><main><div class="top"><span class="brand">ANATOMY <em>QUEST</em></span><span class="chip" id="level">LEVEL 1</span><span class="chip">★ <span id="score">0</span></span><span class="chip heart" id="lives">♥♥♥</span></div><div class="layout"><section class="viewer"><canvas id="scene"></canvas><div class="overlay"><span class="badge" id="modelstatus">LOADING REAL ANATOMY…</span><span class="badge" id="viewlabel">BONES</span></div><div class="assist">Drag to rotate · Scroll/pinch to zoom · Tap to answer</div></section><aside class="side"><div class="panel"><div class="minirow"><span class="eyebrow" id="phase">QUESTION 1 / 5</span><span class="label" id="timer">25s</span></div><div class="progress"><div id="timebar"></div></div><div class="prompt" id="prompt">Find the skull</div><div class="status" id="status"></div><p class="desc" id="explanation">Rotate the anatomical model, then tap the structure.</p></div><div class="panel"><div class="eyebrow">THE MODEL</div><div class="controls" id="layers"><button class="button active" data-layer="bone">Bones</button><button class="button" data-layer="muscle">Muscles</button><button class="button" data-layer="both">Both</button></div><div class="controls"><button class="button" id="resetcam">Reset camera</button><button class="button" id="explore">Explore</button></div></div><div class="panel"><div class="minirow"><div><div class="label">CURRENT SCORE</div><div class="score" id="bigscore">0</div></div><div><div class="label">PERSONAL BEST</div><div class="score" id="best">0</div></div></div><div class="minirow" style="margin-top:10px"><span class="label">STREAK</span><strong id="streak">0 🔥</strong></div><button class="button primary" id="restart">New game</button></div></aside></div><div class="footer">v3.0 · Real anatomical model: Écorché / BodyParts3D / Z-Anatomy (CC BY-SA 4.0) · Requires internet · For education, not clinical use</div></main><div class="screen" id="screen"><div class="modal"><div style="font-size:38px" id="emoji">🦴</div><div class="eyebrow" id="modaleyebrow">3D ANATOMY CHALLENGE</div><h1 id="modaltitle">Know your body?</h1><p id="modaldesc">Find bones and muscles on a rotating 3D model. Five questions per level, faster rounds, bonus hearts and personal bests.</p><button class="button primary" id="modalbutton">Start game</button></div></div><canvas id="confetti"></canvas>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/"}}</script><script type="module">
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {MeshoptDecoder} from 'three/addons/libs/meshopt_decoder.module.js';
+/*GEO*/
+const sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]],cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+const norm=a=>{const l=Math.hypot(a[0],a[1],a[2])||1;return[a[0]/l,a[1]/l,a[2]/l]};
+const PARTS=[];
+function tube(path,radii,s,seg=7){
+  const P=path.map(p=>[p[0]*s,p[1],p[2]]),n=P.length,rings=[];let N=null;
+  for(let i=0;i<n;i++){
+    const T=norm(sub(P[Math.min(i+1,n-1)],P[Math.max(i-1,0)]));
+    if(!N){N=norm(cross(T,Math.abs(T[2])<.9?[0,0,1]:[1,0,0]));}
+    else{const d=dot(N,T);N=norm([N[0]-T[0]*d,N[1]-T[1]*d,N[2]-T[2]*d]);}
+    const B=cross(T,N),r=radii[i],ring=[];
+    for(let j=0;j<seg;j++){const a=j/seg*6.2832,c=Math.cos(a)*r,q=Math.sin(a)*r;ring.push([P[i][0]+N[0]*c+B[0]*q,P[i][1]+N[1]*c+B[1]*q,P[i][2]+N[2]*c+B[2]*q]);}
+    rings.push(ring);
+  }
+  const polys=[];
+  for(let i=0;i<n-1;i++)for(let j=0;j<seg;j++){const k=(j+1)%seg;polys.push([rings[i][j],rings[i][k],rings[i+1][k],rings[i+1][j]]);}
+  polys.push(rings[0],rings[n-1]);return polys;
+}
+function ellipsoid(c,r,s,L=6,M=10){
+  const g=[],polys=[];
+  for(let i=0;i<=L;i++){const th=i/L*Math.PI,row=[];for(let j=0;j<M;j++){const ph=j/M*6.2832;row.push([s*(c[0]+r[0]*Math.sin(th)*Math.cos(ph)),c[1]+r[1]*Math.cos(th),c[2]+r[2]*Math.sin(th)*Math.sin(ph)]);}g.push(row);}
+  for(let i=0;i<L;i++)for(let j=0;j<M;j++){const k=(j+1)%M;polys.push([g[i][j],g[i][k],g[i+1][k],g[i+1][j]]);}
+  return polys;
+}
+const line=(A,B,n)=>Array.from({length:n},(_,i)=>{const t=i/(n-1);return[A[0]+(B[0]-A[0])*t,A[1]+(B[1]-A[1])*t,A[2]+(B[2]-A[2])*t]});
+const bez=(p,n)=>Array.from({length:n},(_,i)=>{const t=i/(n-1),u=1-t;return[0,1,2].map(k=>u*u*u*p[0][k]+3*u*u*t*p[1][k]+3*u*t*t*p[2][k]+t*t*t*p[3][k])});
+const hsh=k=>{let h=7;for(const c of k)h=h*31+c.charCodeAt(0)|0;return h};
+const put=(key,layer,mk,sym,ex={})=>(sym?[1,-1]:[1]).forEach(s=>PARTS.push({key,layer,polys:mk(s),tint:.88+(Math.abs(hsh(key))%22)/100,...ex}));
+const bone=(k,A,B,r,sym=1)=>put(k,"bone",s=>[...tube(line(A,B,6),[1.2,.85,.7,.7,.85,1.2].map(x=>x*r),s),...ellipsoid(A,[r*1.3,r*1.3,r*1.3],s,4,8),...ellipsoid(B,[r*1.3,r*1.3,r*1.3],s,4,8)],sym);
+const rod=(k,A,B,r,sym=1,seg=5)=>put(k,"bone",s=>tube(line(A,B,2),[r,r],s,seg),sym);
+const musc=(k,A,B,r,sym=1)=>put(k,"muscle",s=>tube(line(A,B,7),[.3,.75,1,1,.8,.45,.2].map(x=>x*r),s),sym);
+const ell=(k,layer,c,rd,sym=1)=>put(k,layer,s=>ellipsoid(c,rd,s),sym);
+const dk=(k,c,rd,sym=1)=>put(k,"bone",s=>ellipsoid(c,rd,s,4,8),sym,{dark:1});
+const path=(k,layer,pts,rad,sym=0,seg=7)=>put(k,layer,s=>tube(pts,pts.map((_,i)=>Array.isArray(rad)?rad[i]:rad),s,seg),sym);
+function spine(k,y0,y1,n,z0,z1,bow,rx){const h=Math.abs(y1-y0)/n*.46;for(let i=0;i<n;i++){const t=(i+.5)/n,y=y0+(y1-y0)*t,z=z0+(z1-z0)*t+bow*Math.sin(Math.PI*t);
+  put(k,"bone",s=>[...ellipsoid([0,y,z],[rx,h,rx*.9],s,4,8),...ellipsoid([0,y+.3,z-rx-1],[.7,h*1.1,1.5],s,3,6)],0);}}
+/* Body: y up (feet 0, head ~176), x sideways, z forward. Units ~ cm. */
+ell("Skull","bone",[0,167,.5],[7.8,9,9.2],0);
+ell("Skull","bone",[0,159.5,5.5],[5,5.4,5],0);
+dk("Skull",[2.7,163,9.9],[1.7,1.5,1]);dk("Skull",[0,160,10.2],[.8,1.4,.8],0);
+path("Mandible","bone",[[-5.5,159,4],[-3.5,156,7.5],[0,155,9.5],[3.5,156,7.5],[5.5,159,4]],1.2);
+spine("Cervical vertebrae",153,143.5,7,-1,-2.3,0,1.9);
+spine("Thoracic vertebrae",143,118.5,12,-2.5,-4,-1.5,2.4);
+spine("Lumbar vertebrae",118,101,5,-4,-2.5,1.4,3);
+path("Sacrum","bone",[[0,101,-2.5],[0,95,-4],[0,89,-5.5]],[3.4,3,1.8]);
+path("Sternum","bone",[[0,141,8.5],[0,132,9.2],[0,122,8.6]],[1.6,1.8,1.2]);
+for(let i=0;i<10;i++){const y=141-i*3.1,a=8.2+(i<6?i*1.1:6.6-(i-6)*.6),fx=i<7?1.2:3+(i-7)*2.5,fz=i<7?8.4:7.5-(i-7);
+  path("Ribs","bone",bez([[1.5,y,-4],[a,y-1.2,-2.2],[a-1.2,y-3,6.2],[fx,y-4.2,fz]],8),.7,1,5);}
+path("Clavicle","bone",[[2,141,6.5],[7,142,6],[12,141.5,3],[17,141.5,0]],1.1,1);
+ell("Scapula","bone",[13,131,-6],[6.5,9,1.3]);rod("Scapula",[8,134,-7],[18,137,-6],.8);
+bone("Humerus",[19,139,0],[22,112,0],1.8);
+bone("Ulna",[21.5,111,-1.2],[24,86,-1.2],1);
+bone("Radius",[24.5,111,1.2],[27,86,1.2],.95);
+ell("Carpals","bone",[26.4,85,.4],[2.8,1.7,1.7]);
+[[24.2,2.2,80],[25.7,.6,77.5],[27,.6,77],[28.3,.6,77.5],[29.5,.6,78.5]].forEach(([x,z,y1],f)=>{
+  rod("Metacarpals",[x,84,z],[x+.2,y1,z],.7);
+  path("Finger bones","bone",f?[[x+.2,y1,z],[x+.4,y1-4.4,z],[x+.5,y1-7.3,z],[x+.6,y1-9.4,z]]:[[x+.2,y1,z],[x+.3,y1-3.6,z+.4],[x+.4,y1-6.2,z+.6]],f?[.62,.55,.5,.42]:[.7,.6,.5],1,5);});
+ell("Pelvis","bone",[10,100,-1],[7.5,6,4]);ell("Pelvis","bone",[9,93,0],[6,5,4]);
+rod("Pelvis",[7,91,3.5],[2,87.5,7.5],1.3,1,6);ell("Pelvis","bone",[8,87.5,-3],[2,3,2.5]);
+bone("Femur",[9,93,0],[10.5,51,1],2.4);
+ell("Patella","bone",[10.5,50,4.5],[2,2.6,1.3]);
+bone("Tibia",[10.5,49,1],[10,9,0],1.8);
+bone("Fibula",[14.2,48,0],[13.5,10,0],1);
+ell("Tarsals","bone",[10,3.8,-3],[2.6,2.6,3.6]);ell("Tarsals","bone",[10,7.6,0],[2.4,1.7,2.4]);
+[8.2,9.2,10.2,11.2,12.2].forEach((x,f)=>{rod("Metatarsals",[x,3.4,4.5],[x,2.3,11],f?.55:.8);
+  path("Toe bones","bone",[[x,2.3,11],[x,1.8,13.5],[x,1.5,15.2]],f?[.5,.45,.38]:[.8,.7,.6],1,5);});
+ell("Pectoralis major","muscle",[8,134,8.5],[8,6.5,2.4]);
+ell("Deltoid","muscle",[21,138.5,0],[4.5,6,4.8]);
+musc("Biceps brachii",[20,136,3.3],[24,112,3.3],2.7);
+musc("Triceps brachii",[20,136,-3.3],[24,112,-3.3],2.8);
+musc("Brachioradialis",[24.8,113,2.8],[27.2,95,2.6],1.8);
+musc("Forearm flexors",[23,112,1.8],[26,90,1.8],1.9);
+musc("Forearm extensors",[24,112,-2.4],[27,90,-2.2],2);
+ell("Trapezius","muscle",[0,143,-6.8],[12,9,1.6],0);
+ell("Infraspinatus","muscle",[13,131,-8],[5.5,5,1.2]);
+ell("Latissimus dorsi","muscle",[9,122,-7.2],[8,12,1.8]);
+ell("Serratus anterior","muscle",[14,126,3],[2,7,5]);
+musc("Erector spinae",[3.5,126,-7],[3.5,100,-6],2.3);
+musc("Rectus abdominis",[2.8,122,9.8],[2.8,100,8.6],3);
+musc("Obliques",[12,121,5],[12.5,102,4.5],3.2);
+ell("Gluteus maximus","muscle",[8,95,-8.5],[8,7,4]);
+ell("Gluteus medius","muscle",[12,103,-6.5],[6,4.5,3]);
+musc("Rectus femoris",[9.5,92,6],[10,53,5.8],3.1);
+musc("Vastus lateralis",[14,90,3.5],[13,52,4.5],3.4);
+musc("Vastus medialis",[6.5,76,4.5],[8.5,52,5.2],2.8);
+musc("Sartorius",[14.5,95,5.5],[7.5,55,3.8],1.1);
+musc("Adductors",[5.5,88,1.5],[8,58,1.5],3.2);
+musc("Hamstrings",[10.5,91,-5.5],[10.5,53,-5],4.4);
+musc("Gastrocnemius",[10.2,47,-4],[10,22,-3],3.8);
+musc("Soleus",[11.5,40,-2.2],[10.5,16,-1.5],2.6);
+musc("Tibialis anterior",[11.8,46,4],[10.6,12,3.2],2);
+musc("Sternocleidomastoid",[4.5,157,3],[1.6,141,5],1.5);
+let KEYS=[],seen=new Set();PARTS.forEach(p=>{const id=p.layer+p.key;if(!seen.has(id)){seen.add(id);KEYS.push({key:p.key,layer:p.layer})}});
+/*END*/
+
+const $=s=>document.querySelector(s);
+const cv=$('#scene'),wrap=cv.parentElement;
+const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.6;
+const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(40,1,.1,1500);camera.position.set(125,106,280);const orbit=new OrbitControls(camera,cv);orbit.target.set(0,88,0);orbit.enableDamping=true;orbit.dampingFactor=.085;orbit.minDistance=55;orbit.maxDistance=650;orbit.update();
+scene.add(new THREE.HemisphereLight(0xe9f1ff,0x786e7f,2.4));const lamp=(color,power,x,y,z)=>{const l=new THREE.DirectionalLight(color,power);l.position.set(x,y,z);scene.add(l)};lamp(0xffffff,3.3,100,240,160);lamp(0xadb9ff,1.6,-120,110,-90);lamp(0xffdfc4,1.2,-80,20,170);
+let meshes=[],byName=new Map();let realModel=false;let anatomyRoot=null;let loadingModel=true;const matFor=(part)=>new THREE.MeshStandardMaterial({color:part.layer==='bone'?0xe8d6b4:0xb34a56,roughness:part.layer==='bone'?.7:.53,metalness:.03,side:THREE.DoubleSide,transparent:false});
+for(const p of PARTS){const points=[];for(const polygon of p.polys){for(let i=1;i<polygon.length-1;i++){for(const v of [polygon[0],polygon[i],polygon[i+1]])points.push(...v)}}if(!points.length)continue;const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(points,3));geo.computeVertexNormals();const material=matFor(p),mesh=new THREE.Mesh(geo,material);mesh.userData={key:p.key,layer:p.layer,original:material.color.clone()};scene.add(mesh);meshes.push(mesh);const id=p.layer+'|'+p.key;if(!byName.has(id))byName.set(id,[]);byName.get(id).push(mesh)}
+let layer='bone',exploring=false,active=false,locked=false,level=1,turn=0,score=0,lives=3,streak=0,correct=0,questions=[],target=null,deadline=0,pausedTime=0,timeout=null;const COUNT=5,STORE='anatomy-quest-best-v2';const best=()=>{try{return Number(localStorage.getItem(STORE))||0}catch{return 0}};const save=v=>{try{localStorage.setItem(STORE,String(v))}catch{}};const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};const maxTime=()=>Math.max(11,26-level*2);const pool=()=>KEYS.filter(k=>layer==='both'||k.layer===layer);const visibleKeys=()=>pool().filter(k=>byName.has(k.layer+'|'+k.key));
+function viewChange(v){layer=v;document.querySelectorAll('#layers .button').forEach(b=>b.classList.toggle('active',b.dataset.layer===v));$('#viewlabel').textContent=v.toUpperCase();meshes.forEach(m=>{m.visible=v==='both'||m.userData.layer===v;m.material.opacity=v==='both'&&m.userData.layer==='muscle'?.78:1;m.material.transparent=v==='both'&&m.userData.layer==='muscle';m.material.depthWrite=!m.material.transparent});clearMarks();if(active&&!exploring){questions=makeQuestions();turn=0;next()}else if(exploring){$('#prompt').textContent='Tap any body part';}}
+function clearMarks(){meshes.forEach(m=>{m.material.color.copy(m.userData.original);m.material.emissive.setHex(0);m.material.emissiveIntensity=0})}
+function mark(key,which){meshes.filter(m=>m.userData.key===key).forEach(m=>{m.material.color.set(which==='ok'?0x20c48b:which==='bad'?0xff5369:0x7277ff);m.material.emissive.set(which==='ok'?0x0d7751:which==='bad'?0x99192a:0x2225aa);m.material.emissiveIntensity=.23})}
+function makeQuestions(){
+  const p=visibleKeys();
+  // Level 1 is common anatomy; later levels gradually introduce smaller structures.
+  const easy=/femur|humerus|tibia|fibula|radius|ulna|clavicle|scapula|sternum|mandible|patella|sacrum|trapezius|deltoid|biceps brachii|triceps brachii|rectus abdominis|gluteus maximus|gastrocnemius|pectoralis major|latissimus dorsi|rectus femoris|vastus lateralis|skull|pelvis|ribs/i;
+  const medium=/vertebra|metacarp|metatars|carpal|tarsal|oblique|adductor|serratus|soleus|temporalis|masseter|frontal|parietal|occipital/i;
+  let subset=level===1?p.filter(q=>easy.test(q.key)):level===2?p.filter(q=>easy.test(q.key)||medium.test(q.key)):p;
+  if(subset.length<COUNT)subset=p;
+  return shuffle(subset.slice()).slice(0,Math.min(COUNT,subset.length));
+}
+function refresh(){ $('#level').textContent='LEVEL '+level;$('#score').textContent=score;$('#bigscore').textContent=score;$('#lives').textContent=lives>5?'♥ ×'+lives:'♥'.repeat(lives)||'♡';$('#streak').textContent=streak+' 🔥';$('#best').textContent=Math.max(best(),score);$('#phase').textContent=exploring?'EXPLORE':`QUESTION ${Math.min(turn+1,COUNT)} / ${COUNT}`}
+function newGame(){clearTimeout(timeout);active=true;exploring=false;$('#explore').textContent='Explore';level=1;turn=0;score=0;lives=3;streak=0;correct=0;questions=makeQuestions();$('#screen').classList.add('hidden');next()}
+function next(){clearTimeout(timeout);if(!active||exploring)return;if(turn>=questions.length)return levelDone();clearMarks();locked=false;target=questions[turn];$('#prompt').textContent='Find the '+target.key;$('#status').textContent='';$('#status').className='status';$('#explanation').textContent='Rotate the model, then tap the correct '+(target.layer==='bone'?'bone':'muscle')+'.';deadline=performance.now()+maxTime()*1000;refresh()}
+function showModal(emoji,eyebrow,title,desc,btn,action){$('#emoji').textContent=emoji;$('#modaleyebrow').textContent=eyebrow;$('#modaltitle').textContent=title;$('#modaldesc').textContent=desc;$('#modalbutton').textContent=btn;$('#modalbutton').onclick=()=>{$('#screen').classList.add('hidden');action()};$('#screen').classList.remove('hidden')}
+function levelDone(){locked=true;active=false;clearMarks();lives++;refresh();showModal('🫀','LEVEL COMPLETED',`Level ${level} cleared!`,`Score ${score} · +1 heart. Next level is faster and challenges you with more anatomy.`,`Start level ${level+1}`,()=>{level++;turn=0;active=true;questions=makeQuestions();next()})}
+function finishGame(){active=false;locked=true;clearTimeout(timeout);clearMarks();const was=best(),record=score>was;if(record){save(score);burst()}refresh();showModal(record?'🏆':'🦴',record?'NEW PERSONAL BEST':'GAME OVER',record?'New record!':'Nice run!',`You scored ${score} points and reached level ${level}. Best: ${best()}.`,'Play again',newGame)}
+function resolve(name){if(locked||!active)return;locked=true;const seconds=Math.max(0,(deadline-performance.now())/1000),ok=name===target.key;if(ok){streak++;correct++;score+=100*level+Math.round(seconds*6)+Math.min(5,streak)*20;mark(target.key,'ok');$('#status').textContent='Correct! + points';$('#status').className='status ok'}else{streak=0;lives--;mark(target.key,'ok');if(name)mark(name,'bad');$('#status').textContent=name?'That was '+name:'Time is up!';$('#status').className='status bad'}refresh();timeout=setTimeout(()=>{turn++;if(lives<=0)finishGame();else next()},ok?800:1400)}
+const picker=new THREE.Raycaster(),mouse=new THREE.Vector2();let down=null;
+cv.addEventListener('pointerdown',e=>{down={x:e.clientX,y:e.clientY}});cv.addEventListener('pointerup',e=>{if(!down||Math.hypot(e.clientX-down.x,e.clientY-down.y)>8){down=null;return}down=null;const r=cv.getBoundingClientRect();mouse.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);picker.setFromCamera(mouse,camera);const hits=picker.intersectObjects(meshes.filter(m=>m.visible),false);if(!hits.length)return;const m=hits[0].object;if(exploring){clearMarks();mark(m.userData.key,'sel');$('#prompt').textContent=m.userData.key;$('#status').textContent=m.userData.layer==='bone'?'Bone':'Muscle';return}if(!active||locked)return;resolve(m.userData.key)});
+function animate(now){requestAnimationFrame(animate);orbit.update();const rect=wrap.getBoundingClientRect();if(rect.width&&rect.height&&(cv.width!==Math.round(rect.width*Math.min(devicePixelRatio,2))||cv.height!==Math.round(rect.height*Math.min(devicePixelRatio,2)))){renderer.setSize(rect.width,rect.height,false);camera.aspect=rect.width/rect.height;camera.updateProjectionMatrix()}renderer.render(scene,camera);if(active&&!locked&&!exploring){const left=Math.max(0,(deadline-now)/1000);$('#timer').textContent=Math.ceil(left)+'s';$('#timebar').style.transform=`scaleX(${left/maxTime()})`;$('#timebar').style.background=left<5?'#ed636e':'#5b60f5';if(left<=0)resolve(null)}}requestAnimationFrame(animate);
+$('#resetcam').onclick=()=>{camera.position.set(125,106,280);orbit.target.set(0,88,0);orbit.update()};$('#restart').onclick=()=>showModal('↻','RESTART','Start over?','Your current run will be replaced.','Restart game',newGame);$('#explore').onclick=()=>{if(!exploring){exploring=true;pausedTime=Math.max(0,deadline-performance.now());clearTimeout(timeout);locked=false;$('#explore').textContent='Return to quiz';$('#prompt').textContent='Explore anatomy';$('#status').textContent='Tap any bone or muscle';$('#timebar').style.transform='scaleX(1)'}else{exploring=false;$('#explore').textContent='Explore';if(!active){newGame();return}deadline=performance.now()+Math.max(500,pausedTime);clearMarks();$('#prompt').textContent='Find the '+target.key;$('#status').textContent=''}refresh()};document.querySelectorAll('#layers button').forEach(b=>b.onclick=()=>viewChange(b.dataset.layer));
+function burst(){if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;const c=$('#confetti'),x=c.getContext('2d');c.width=innerWidth;c.height=innerHeight;const colors=['#5b60f5','#ff6279','#fbc14b','#35bf9f','#9b7cff'];let particles=Array.from({length:240},()=>({x:Math.random()*c.width,y:-Math.random()*c.height,v:2+Math.random()*5,r:2+Math.random()*5,col:colors[Math.random()*colors.length|0],s:Math.random()*6})),frames=0;(function frame(){x.clearRect(0,0,c.width,c.height);particles.forEach(p=>{p.y+=p.v;p.x+=Math.sin(p.y/28+p.s)*1.3;x.fillStyle=p.col;x.fillRect(p.x,p.y,p.r,p.r*1.8)});if(frames++<210)requestAnimationFrame(frame);else x.clearRect(0,0,c.width,c.height)})()}
+
+// Load a real anatomical atlas: 634 individually named meshes, bones and muscles.
+// The procedural geometry is retained as a graceful fallback if the host blocks remote assets.
+const statusBadge=$('#modelstatus');
+const modelUrls=[
+ 'https://cdn.jsdelivr.net/gh/Charleeh/ecorche@main/model/ecorche.meshopt.glb',
+ 'https://raw.githubusercontent.com/Charleeh/ecorche/main/model/ecorche.meshopt.glb',
+ 'https://charleeh.github.io/ecorche/model/ecorche.meshopt.glb'
+];
+const loader=new GLTFLoader();loader.setMeshoptDecoder(MeshoptDecoder);
+async function loadAnatomy(){
+ let gltf=null,lastError=null;
+ for(const url of modelUrls){
+   try{gltf=await loader.loadAsync(url);break}catch(e){lastError=e;console.warn('Anatomy model fetch failed',url,e)}
+ }
+ if(!gltf){loadingModel=false;statusBadge.textContent='SIMPLIFIED FALLBACK';statusBadge.title='Real model unavailable: '+String(lastError);return;}
+ const root=gltf.scene,items=[],newMap=new Map(),newKeys=[],used=new Set();
+ // Native unit is 1.8 m. Match original game camera's 180 cm world.
+ root.scale.multiplyScalar(100);root.updateMatrixWorld(true);
+ root.traverse(o=>{
+   if(!o.isMesh)return;
+   let node=o;while(node&&!node.userData?.layer)node=node.parent;const data=node?.userData||o.userData||{},kind=String(data.layer||'').toLowerCase();
+   const group=kind==='skeleton'?'bone':kind.includes('muscle')?'muscle':null;
+   if(!group)return;
+   const label=String(data.name||data.group||o.name||'').replace(/_/g,' ').trim();
+   if(!label)return;
+   // Separate side labels retain accuracy when the learner taps left/right.
+   const key=label.replace(/\s*\(\d+\)$/,'');
+   o.material=o.material.clone();
+   o.material.side=THREE.FrontSide;
+   o.material.roughness=.76;
+   o.material.metalness=0;
+   o.userData={...data,key,layer:group,original:o.material.color.clone()};
+   items.push(o);
+   const id=group+'|'+key;
+   if(!newMap.has(id))newMap.set(id,[]);
+   newMap.get(id).push(o);
+   if(!used.has(id)){used.add(id);newKeys.push({key,layer:group})}
+ });
+ if(items.length<100)throw new Error('Anatomical file has too few named meshes');
+ for(const m of meshes){scene.remove(m);m.geometry.dispose();m.material.dispose()}
+ meshes=items;byName=newMap;KEYS=newKeys;
+ anatomyRoot=root;scene.add(root);realModel=true;loadingModel=false;
+ // Using real anatomical proportions and original model's vertex colours.
+ statusBadge.textContent=`REAL ANATOMY · ${newKeys.length} PARTS`;
+ statusBadge.title='Model: Écorché, CC BY-SA 4.0; BodyParts3D and Z-Anatomy';
+ clearMarks();viewChange(layer);refresh();
+}
+loadAnatomy().catch(e=>{loadingModel=false;console.error(e);statusBadge.textContent='SIMPLIFIED FALLBACK'});
+
+refresh();requestAnimationFrame(animate);$('#modalbutton').onclick=()=>{if(loadingModel){$('#modaldesc').textContent='The anatomical model is loading. Please try again in a moment.';return}newGame()};
+</script></body></html>
