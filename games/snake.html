@@ -56,4 +56,9 @@ c.addEventListener("touchend",e=>{const t=e.changedTouches[0],dx=t.clientX-tx,dy
  Math.abs(dx)>Math.abs(dy)?turn(Math.sign(dx),0):turn(0,Math.sign(dy));});
 document.querySelectorAll("#dpad button").forEach(b=>b.addEventListener("pointerdown",e=>{e.preventDefault();turn(+b.dataset.x,+b.dataset.y)}));
 reset();
-</script></body></html>
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.min.js"></script>
+<script src="../arcade.js"></script>
+<script>Arcade.gate()</script>
+
+</body></html>
