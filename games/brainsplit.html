@@ -189,5 +189,10 @@ let saved='light';try{saved=localStorage.getItem('bs-theme')||'light'}catch(e){}
 setTheme(saved);
 $('#theme').onclick=()=>setTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.min.js"></script>
+<script src="https://dinko1990.github.io/GamePortal/arcade.js"></script>
+<script>Arcade.gate()</script>
+ 
 </body>
 </html>
