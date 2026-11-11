@@ -163,4 +163,9 @@ const themeBtns=document.querySelectorAll('.themebtn');
 function setTheme(t){document.documentElement.dataset.theme=t;themeBtns.forEach(b=>b.textContent=t==='dark'?'☀️':'🌙');try{localStorage.setItem('aq-theme',t)}catch{}}
 let th=null;try{th=localStorage.getItem('aq-theme')}catch{}setTheme(th||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'));
 themeBtns.forEach(b=>b.onclick=()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark'));$('#portal').href=PORTAL_URL;
-</script></body></html>
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.min.js"></script>
+<script src="../arcade.js"></script>
+<script>Arcade.gate()</script>
+</body></html>
