@@ -3,6 +3,7 @@
 (function () {
   const SB_URL = 'https://nltmttfkfwmuvelsuoeh.supabase.co';
   const SB_KEY = 'sb_publishable_uWaDHrNqVP_w4F5BWlODLA_Z8ar8Oge'; // public key: safe in front-end code
+  const EMAIL_ONLY = true; // true = email code is the only way to log in (no username/password option)
   const LEN = 6; // must match "Email OTP length" in Supabase
   const sb = window.supabase.createClient(SB_URL, SB_KEY);
   const esc = t => String(t).replace(/[&<>"']/g, c => '&#' + c.charCodeAt(0) + ';');
@@ -49,6 +50,7 @@
 
   // ---- UI (dark, matches the portal) ----
   const CSS = `.ar-pill{position:fixed;top:12px;right:12px;z-index:2147483646;display:flex;gap:8px;align-items:center;background:#1c1d2bee;color:#eef;border:1px solid #33354d;border-radius:999px;padding:5px 6px 5px 14px;font:600 13px system-ui,sans-serif;backdrop-filter:blur(6px)}
+.ar-pill.ar-inline{position:static;display:inline-flex}
 .ar-pill button{background:#2a2c44;color:#eef;border:0;border-radius:999px;padding:7px 13px;font:700 13px system-ui,sans-serif;cursor:pointer}.ar-pill button:first-child:last-child{margin-left:-8px}
 .ar-ov{position:fixed;inset:0;z-index:2147483647;background:#0c0d14f0;display:none;place-items:center;padding:16px;font-family:system-ui,sans-serif}
 .ar-card{width:min(380px,100%);background:#1c1d2b;border:1px solid #33354d;border-radius:22px;padding:24px;color:#eef;box-shadow:0 20px 60px #0008}.ar-card h2{margin:0 0 4px;font-size:22px}.ar-card p{margin:0 0 16px;color:#9a9db8;font-size:13px;line-height:1.45}
@@ -66,10 +68,10 @@
     const m = `<div class="ar-msg" style="color:${good ? '#7ee0a0' : '#ff8a8a'}">${esc(msg)}</div>`;
     const x = required ? '' : '<button class="ar-btn ar-ghost" id="ar-x">Not now</button>';
     if (view === 'email') {
-      c.innerHTML = `<h2>🎮 Log in to play</h2><p>Enter your email. We'll send you a ${LEN}-digit code. No password needed.</p><input id="ar-e" type="email" placeholder="you@example.com" autocomplete="email" autocapitalize="none" spellcheck="false"><button class="ar-btn ar-primary" id="ar-send">Send code</button>${m}<button class="ar-link" id="ar-pw">Use a username and password instead</button>${x}`;
+      c.innerHTML = `<h2>🎮 Log in to play</h2><p>Enter your email. We'll send you a ${LEN}-digit code. No password needed.</p><input id="ar-e" type="email" placeholder="you@example.com" autocomplete="email" autocapitalize="none" spellcheck="false"><button class="ar-btn ar-primary" id="ar-send">Send code</button>${m}${EMAIL_ONLY ? '' : '<button class="ar-link" id="ar-pw">Use a username and password instead</button>'}${x}`;
       const send = async () => { const e = q('#ar-e').value.trim().toLowerCase(); if (!/^\S+@\S+\.\S+$/.test(e)) return render('Please enter a valid email.'); q('#ar-send').textContent = 'Sending…'; const r = await A.sendCode(e); if (r) return render(r); pending = e; view = 'code'; render('Code sent!', true); };
       q('#ar-send').onclick = send; q('#ar-e').onkeydown = ev => { if (ev.key === 'Enter') send(); };
-      q('#ar-pw').onclick = () => { view = 'pw'; render(); };
+      if (q('#ar-pw')) q('#ar-pw').onclick = () => { view = 'pw'; render(); };
     } else if (view === 'code') {
       c.innerHTML = `<h2>Check your email</h2><p>We sent a ${LEN}-digit code to <b>${esc(pending)}</b>. It can take a minute. Check your spam folder too.</p><input id="ar-c" inputmode="numeric" autocomplete="one-time-code" maxlength="${LEN}" placeholder="${'0'.repeat(LEN)}" style="text-align:center;letter-spacing:8px;font-size:24px"><button class="ar-btn ar-primary" id="ar-ver">Log in</button>${m}<button class="ar-link" id="ar-back">Use a different email</button>`;
       const ver = async () => { const code = q('#ar-c').value.replace(/\D/g, ''); if (code.length !== LEN) return render(`Enter all ${LEN} digits.`); q('#ar-ver').textContent = 'Checking…'; const r = await A.verifyCode(pending, code); if (r) return render(r); };
@@ -94,7 +96,8 @@
     if (ov) { const show = !A.user && (required || ov.dataset.open === '1'); ov.style.display = show ? 'grid' : 'none'; if (A.user) { view = 'email'; render(); } }
     drawPill();
   }
-  A.corner = () => { css(); pill = document.createElement('div'); pill.className = 'ar-pill'; document.documentElement.appendChild(pill); modal(); A.ready.then(sync); };
+  A.corner = el => { css(); pill = document.createElement('div'); pill.className = 'ar-pill' + (el ? ' ar-inline' : ''); (el || document.documentElement).appendChild(pill); modal(); A.ready.then(sync); };
+  A.open = () => { modal().dataset.open = '1'; sync(); };
   A.gate = () => { required = true; modal(); render(); A.ready.then(sync); };
   A.mount = () => A.corner(); // old name, kept so existing pages keep working
 
