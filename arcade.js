@@ -95,7 +95,7 @@
     const m = `<div class="ar-msg" style="color:${good ? '#7ee0a0' : '#ff8a8a'}">${esc(msg)}</div>`;
     const x = REQUIRE_LOGIN ? '' : '<button class="ar-btn ar-ghost" id="ar-x">Not now</button>';
     if (ui.view === 'email') {
-      c.innerHTML = `<h2>${CONFIG.text.title}</h2><p>${esc(CONFIG.text.emailHint)}</p><input id="ar-e" type="email" placeholder="you@example.com" autocomplete="email" autocapitalize="none" spellcheck="false"><button class="ar-btn ar-primary" id="ar-send">Send code</button>${m}${x}`;
+      c.innerHTML = `<h2>${CONFIG.text.title}</h2><p>${esc(CONFIG.text.emailHint)}</p><input id="ar-e" type="email" placeholder="Enter your email address" autocomplete="email" autocapitalize="none" spellcheck="false"><button class="ar-btn ar-primary" id="ar-send">Send code</button>${m}${x}`;
       const send = async () => {
         const e = q('#ar-e').value.trim().toLowerCase(); if (!/^\S+@\S+\.\S+$/.test(e)) return ui.card('Please enter a valid email.');
         q('#ar-send').textContent = 'Sending…'; const r = await A.sendCode(e); if (r) return ui.card(r);
