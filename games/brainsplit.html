@@ -63,7 +63,7 @@ p{margin:0;color:var(--mute);max-width:36ch;line-height:1.45}
 <button class="pill themebtn" id="theme" type="button"></button>
 <canvas id="cf" aria-hidden="true"></canvas>
 <main><div id="arcade-header" style="display:flex;justify-content:flex-end"></div><div id="app"></div></main>
-<div class="ver">v3.3</div>
+<div class="ver">v3.4</div>
 <script>
 const $=s=>document.querySelector(s),app=$('#app');
 const MIX={ // paint-style mixing
@@ -170,8 +170,9 @@ function levelDone(){
 }
 function over(){
  const b=best(),nb=S.score>b;if(nb)saveBest(S.score);
+ const nm=window.Arcade&&Arcade.name(),who=nm?', '+String(nm).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';'):'';
  window.Arcade&&Arcade.save('brainsplit',{score:S.score,level:S.level,correct:S.correct});
- app.innerHTML=`<div class="center">${nb?'<div class="rec">\U0001F3C6 NEW RECORD!</div>':''}<div class="big" id="sc">0</div><p>${nb?(b?`You beat your old best of ${b}. Incredible!`:'Your first score on the board. Now beat it!'):`Best score: ${b}.`} You reached level ${S.level} with ${S.correct} correct answers.</p><button class="btn" id="again">Play again</button></div>`;
+ app.innerHTML=`<div class="center">${nb?`<div class="rec">🏆 NEW RECORD${who}!</div>`:''}<div class="big" id="sc">0</div><p>${nb?(b?`You beat your old best of ${b}. Incredible!`:'Your first score on the board. Now beat it!'):`Best score: ${b}.`} You reached level ${S.level} with ${S.correct} correct answers.</p><button class="btn" id="again">Play again</button></div>`;
  $('#again').onclick=home;
  countUp($('#sc'),S.score);
  if(nb){burst(.2);burst(.8);setTimeout(()=>burst(.5),500);setTimeout(()=>{burst(.3);burst(.7)},1100);setTimeout(()=>burst(.5),1800)}
