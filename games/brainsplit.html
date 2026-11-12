@@ -56,13 +56,14 @@ p{margin:0;color:var(--mute);max-width:36ch;line-height:1.45}
 @media (prefers-reduced-motion:reduce){.rec,.bonus{animation:none}}
 .ver{position:fixed;left:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));font-size:12px;color:var(--mute);opacity:.7;pointer-events:none}
 [hidden]{display:none!important}
+#app{display:flex;flex-direction:column;gap:16px}
 </style>
 </head>
 <body>
 <button class="pill themebtn" id="theme" type="button"></button>
 <canvas id="cf" aria-hidden="true"></canvas>
-<main id="app"></main>
-<div class="ver">v3.2</div>
+<main><div id="arcade-header" style="display:flex;justify-content:flex-end"></div><div id="app"></div></main>
+<div class="ver">v3.3</div>
 <script>
 const $=s=>document.querySelector(s),app=$('#app');
 const MIX={ // paint-style mixing
@@ -169,6 +170,7 @@ function levelDone(){
 }
 function over(){
  const b=best(),nb=S.score>b;if(nb)saveBest(S.score);
+ window.Arcade&&Arcade.save('brainsplit',{score:S.score,level:S.level,correct:S.correct});
  app.innerHTML=`<div class="center">${nb?'<div class="rec">\U0001F3C6 NEW RECORD!</div>':''}<div class="big" id="sc">0</div><p>${nb?(b?`You beat your old best of ${b}. Incredible!`:'Your first score on the board. Now beat it!'):`Best score: ${b}.`} You reached level ${S.level} with ${S.correct} correct answers.</p><button class="btn" id="again">Play again</button></div>`;
  $('#again').onclick=home;
  countUp($('#sc'),S.score);
@@ -190,9 +192,7 @@ setTheme(saved);
 $('#theme').onclick=()=>setTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.min.js"></script>
-<script src="https://dinko1990.github.io/GamePortal/arcade.js"></script>
-<script>Arcade.gate()</script>
+<script src="../arcade.js"></script>
  
 </body>
 </html>
