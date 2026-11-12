@@ -14,7 +14,7 @@
 <body>
 <canvas id="confetti" aria-hidden="true"></canvas>
 <main>
- <div class="top"><div class="brand"><b>Number</b> <em>Rush</em></div><div style="display:flex;gap:7px"><a class="pill" href="../index.html">← Portal</a><button class="smallbtn" id="info" aria-label="How to play">ⓘ</button></div></div>
+ <div class="top"><div class="brand"><b>Number</b> <em>Rush</em></div><div style="display:flex;gap:7px"><span id="arcade-header"></span><button class="smallbtn" id="info" aria-label="How to play">ⓘ</button></div></div>
  <div class="modebar" id="modes"><button class="mode active" data-mode="easy">Easy</button><button class="mode" data-mode="medium">Medium</button><button class="mode" data-mode="hard">Hard</button></div>
  <div class="status"><span class="pill">Score <b class="score" id="score">0</b></span><span class="hearts" id="hearts" aria-label="Lives">♥ ♥ ♥</span><span class="pill">Best <b id="best">0</b></span></div>
  <section class="stage"><div class="eyebrow">Target · <span id="roundlabel">Round 1</span></div><div class="target" id="target">—</div><div class="timerrow"><div class="bar" id="bar"><div class="fill" id="fill"></div></div><div class="time" id="time">1:30</div></div></section>
@@ -27,7 +27,7 @@
 </main>
 <div class="overlay" id="overlay" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div id="modalBadge" class="eyebrow"></div><h2 id="modalTitle"></h2><div id="modalBody"></div><button class="primary" id="continue">Next round →</button></div></div>
 <div class="overlay" id="help" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><h2 id="helpTitle">How to play</h2><p>Tap a number, an operation, then another number. The result becomes a new tile. Reach the target to solve automatically. Undo restores the previous numbers.</p><p>Score carries between rounds. Lose a heart when time runs out. Every 3 solved rounds earns +1 heart (up to 6).</p><p>Easy: 1–2 operations. Medium: 3. Hard: 4–5. Faster solutions earn more points.</p><button class="primary" id="helpclose">Got it</button></div></div>
-<button class="pill themebtn" id="theme"></button><div class="ver">v2.1</div>
+<button class="pill themebtn" id="theme"></button><div class="ver">v2.2</div>
 <script>
 (()=>{'use strict';
 const $=id=>document.getElementById(id),ops={'+':'+','-':'−','*':'×','/':'÷'},durations={easy:110,medium:85,hard:65},settings={easy:{steps:[1,2],large:1},medium:{steps:[3,3],large:2},hard:{steps:[4,5],large:2}};
@@ -106,6 +106,7 @@ function finish(won,playerSteps){
  if(won){let p=document.createElement('p');p.textContent=`+${Math.round(120+seconds*5+(mode==='hard'?350:mode==='medium'?175:0))} points · Total ${score.toLocaleString()}`;body.append(p)}
  if(bonus){let d=document.createElement('div');d.className='bonus';d.textContent='♥ +1 EXTRA HEART';body.append(d)}
  if(newBest){let d=document.createElement('div');d.className='record';d.textContent='🏆 NEW RECORD!';body.prepend(d);confetti()}
+ if(lives===0)window.Arcade&&Arcade.save('number-rush',{score,mode,total:round,correct:solved});
  if(lives===0){let p=document.createElement('p');p.textContent=`Final score: ${score.toLocaleString()} · Best: ${best.toLocaleString()}`;body.append(p);$('continue').textContent='Play again';}
  else $('continue').textContent='Next round →';
  $('overlay').hidden=false;
@@ -126,5 +127,6 @@ let parts=[],burstFrame=0;function confetti(){if(matchMedia('(prefers-reduced-mo
 initRun();
 })();
 </script>
+<script src="../arcade.js"></script>
 </body>
 </html>
