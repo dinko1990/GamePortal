@@ -88,6 +88,7 @@
 
 
   /* ================= MATCH ENGINE: bot + friend ================= */
+  const MP_VER = '1.4'; // both players must run the same version of this file
   const Q = () => window.AQ, EASY = /femur|humerus|tibia|fibula|radius|ulna|clavicle|scapula|sternum|mandible|patella|sacrum|skull|pelvis|ribs/i;
   const MULT = [1, 1, 1.5, 2, 2.5], ROUNDS = 5, boxes = {};
   let G = null, ch = null, ui = null, pendingRoom = new URLSearchParams(location.search).get('room'), leaveT = null;
@@ -202,7 +203,7 @@
   // ----- friend rooms (Supabase Realtime) -----
   function showRoom(c, host) {
     const link = location.origin + location.pathname + '?room=' + c;
-    screen.innerHTML = `<div class="wrap"><div class="card" style="text-align:center"><b>${host ? 'Invite a friend' : 'Joining room'}</b><div class="big" style="letter-spacing:8px;margin:8px 0">${c}</div><div class="muted">${host ? 'Send the code or link. The match starts when your friend joins.' : 'Waiting for the host…'}</div>${host ? `<input readonly value="${link}" style="margin-top:10px"><button class="button primary" id="mpcopy">Copy link</button>` : ''}<button class="button" id="mpcancel" style="width:100%;margin-top:8px">Cancel</button></div></div>`;
+    screen.innerHTML = `<div class="wrap"><div class="card" style="text-align:center"><b>${host ? 'Invite a friend' : 'Joining room'}</b><div class="big" style="letter-spacing:8px;margin:8px 0">${c}</div><div class="muted">${host ? 'Send the code or link. The match starts when your friend joins.' : 'Waiting for the host…'}</div>${host ? `<input readonly value="${link}" style="margin-top:10px"><button class="button primary" id="mpcopy">Copy link</button>` : ''}<div class="msg" id="mpvm"></div><button class="button" id="mpcancel" style="width:100%;margin-top:8px">Cancel</button></div></div>`;
     const cp = $('#mpcopy'); if (cp) cp.onclick = () => { navigator.clipboard && navigator.clipboard.writeText(link); cp.textContent = 'Copied ✓'; };
     $('#mpcancel').onclick = () => { if (ch) { ch.unsubscribe(); ch = null; } open(); };
   }
@@ -220,10 +221,10 @@
     });
     ch.on('presence', { event: 'sync' }, () => {
       const ps = players(); if (ps.length > 2 && !G) { alert('That room is full.'); ch.unsubscribe(); ch = null; open(); return; }
-      if (ps.length === 2) { clearTimeout(leaveT); if (host && !G) { const o = ps.find(p => p.uid !== uid), t = pickTargets(); ch.send({ type: 'broadcast', event: 'm', payload: { t: 'start', targets: t, host: nick } }); begin({ ch: 1, host: 1, oppName: o.nick, targets: t }); } }
+      if (ps.length === 2) { const o0 = ps.find(p => p.uid !== uid); if (o0 && o0.v !== MP_VER) { const e = $('#mpvm'); if (e) e.textContent = '⚠ One of you has an older version of the game. Both press Ctrl+Shift+R, then join again.'; return; } clearTimeout(leaveT); if (host && !G) { const o = ps.find(p => p.uid !== uid), t = pickTargets(); ch.send({ type: 'broadcast', event: 'm', payload: { t: 'start', targets: t, host: nick } }); begin({ ch: 1, host: 1, oppName: o.nick, targets: t }); } }
     });
     ch.on('presence', { event: 'leave' }, () => { if (G && G.ch && !G.done) { clearTimeout(leaveT); leaveT = setTimeout(() => { if (players().length < 2) forfeitWin(); }, 20000); } });
-    ch.subscribe(async st => { if (st === 'SUBSCRIBED') await ch.track({ nick, uid }); });
+    ch.subscribe(async st => { if (st === 'SUBSCRIBED') await ch.track({ nick, uid, v: MP_VER }); });
   }
   // tap a bone -> it turns green (same feel as the normal Find it mode); Lock in makes it final
   (function () {
