@@ -101,12 +101,25 @@
   function pickTargets() { const all = Q().KEYS().filter(k => k.layer === 'bone').map(k => k.key), easy = all.filter(k => EASY.test(k)), t = []; while (t.length < ROUNDS) t.push(rnd((t.length < 2 && easy.length > 3 ? easy : all).filter(k => !t.includes(k)))); return t; }
   function botPick(t, skill) { if (Math.random() < .25 + .5 * skill) return t; const near = Q().KEYS().filter(k => k.layer === 'bone' && k.key !== t).map(k => [gap(k.key, t), k.key]).sort((a, b) => a[0] - b[0]).slice(0, 8); return rnd(near)[1]; }
 
-  const MCSS = `.mp-on .hud,.mp-on .answers,.mp-on #wi,.mp-on #focusbtn,.mp-on .top,.mp-on .side,.mp-on .footer{display:none!important}.mp-on .layout{grid-template-columns:1fr!important}
+  const MCSS = `@keyframes mpp{from{opacity:.7}to{opacity:1}}.mpt .hp:first-child{border-left:5px solid #3b82f6}.mpt .hp:last-child{border-left:5px solid #f97316}#hp1{background:#3b82f6!important}#hp2{background:#f97316!important}.al{display:none;margin-top:6px;padding:6px 10px;border-radius:10px;font-weight:800;font-size:14px;color:#fff;background:#f97316}.al.show{display:block}.al.me{background:#3b82f6}.al.warn{animation:mpp .9s infinite alternate}.al.hot{font-size:19px;background:#ea580c;animation:mpp .45s infinite alternate}.al .alb{height:5px;background:#fff4;border-radius:5px;margin-top:4px;overflow:hidden}.al .alb i{display:block;height:100%;background:#fff}#mpg.urgent::after{content:'';position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 44px 8px rgba(249,115,22,.55);animation:mpp .7s infinite alternate}@media(prefers-reduced-motion:reduce){.al,#mpg::after{animation:none!important}}.mp-on .hud,.mp-on .answers,.mp-on #wi,.mp-on #focusbtn,.mp-on .top,.mp-on .side,.mp-on .footer{display:none!important}.mp-on .layout{grid-template-columns:1fr!important}
 #mpg{position:absolute;inset:0;pointer-events:none;font-family:inherit}#mpg .mpt,#mpg .mpb,#mpg .sel{pointer-events:none}#mpg button,#mpg .mpres,#mpg .mpres *{pointer-events:auto}.mpt{position:absolute;top:8px;left:8px;right:54px;display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start}
 .mpt .hp,.mpt .mc{background:var(--glass);border:1px solid var(--line);border-radius:14px;padding:7px 10px;font-size:13px;font-weight:800}.mpt .hp{flex:1;min-width:120px}.mpt .mc{flex:2;min-width:170px;text-align:center}.mpt .bar{height:9px;background:var(--btn);border-radius:9px;overflow:hidden;margin:4px 0}.mpt .bar i{display:block;height:100%;background:var(--ok);transition:width .5s}
 .mpb{position:absolute;left:0;right:0;bottom:14px;display:flex;flex-direction:column;align-items:center;gap:8px}.mpb .sel{background:var(--glass);border-radius:12px;padding:6px 12px;font-weight:800;font-size:14px;max-width:90%;text-align:center}.mpb .button.primary{width:min(320px,80%);margin:0;padding:14px}
 .mpres{position:absolute;inset:0;background:#0009;display:grid;place-items:center;padding:16px}.mpres .card{width:min(360px,100%);text-align:center}#mpx{position:absolute;top:54px;right:8px;padding:6px 10px;font-size:12px}`;
 
+  const ME = '#3b82f6', OPP = '#f97316', BOTH = '#a855f7', GOLD = '#facc15';
+  function tint(key, hex, ei = .4) { Q().meshes().filter(m => m.userData.key === key).forEach(m => { m.material.color.set(hex); m.material.emissive.set(hex); m.material.emissiveIntensity = ei; }); }
+  let halos = [];
+  function clearHalos() { halos.forEach(([p, h]) => { p.remove(h); h.material.dispose(); }); halos = []; }
+  function halo(key) { // yellow glow around the right bone: a slightly larger shell drawn behind it
+    const T3 = Q().THREE;
+    Q().meshes().filter(m => m.userData.key === key).forEach(m => {
+      m.geometry.computeBoundingSphere(); const c = m.geometry.boundingSphere.center, s = 1.12;
+      const h = new T3.Mesh(m.geometry, new T3.MeshBasicMaterial({ color: GOLD, side: T3.BackSide, transparent: true, opacity: .75, depthWrite: false }));
+      h.scale.setScalar(s); h.position.copy(c).multiplyScalar(1 - s); m.add(h); halos.push([m, h]);
+    });
+  }
+  const H = (id, h) => { const e = ui && ui.querySelector(id); if (e) e.innerHTML = h; };
   async function begin(o) {
     if (!Q() || !Q().ready()) { alert('The 3D model is still loading. Try again in a moment.'); return; }
     if (ui) ui.remove(); clearInterval(G && G.iv);
@@ -114,14 +127,14 @@
     if (!document.getElementById('mpcss')) { const s = document.createElement('style'); s.id = 'mpcss'; s.textContent = MCSS; document.head.appendChild(s); }
     document.body.classList.add('mp-on'); Q().mpActive = true; Q().setLayer('bone'); Q().showApp(); screen.style.display = 'none';
     ui = document.createElement('div'); ui.id = 'mpg';
-    ui.innerHTML = `<div class="mpt"><div class="hp"><span>${esc(nick)}</span> <span id="ht1">100</span><div class="bar"><i id="hp1" style="width:100%"></i></div></div><div class="mc"><div id="mpr"></div><div id="mpq" style="font-size:18px"></div><div id="mpk" class="muted"></div></div><div class="hp"><span>${esc(G.oppName)}</span> <span id="ht2">100</span><div class="bar"><i id="hp2" style="width:100%"></i></div></div></div><button class="button" id="mpx">✕ Leave</button><div class="mpb"><div class="sel" id="mpsel">Tap a bone</div><button class="button primary" id="mplock" disabled>Lock in</button></div>`;
+    ui.innerHTML = `<div class="mpt"><div class="hp"><span>🔵 ${esc(nick)}</span> <span id="ht1">100</span><div class="bar"><i id="hp1" style="width:100%"></i></div></div><div class="mc"><div id="mpr"></div><div id="mpq" style="font-size:18px"></div><div id="mpk" class="muted"></div><div id="mpal" class="al"></div></div><div class="hp"><span>🟠 ${esc(G.oppName)}</span> <span id="ht2">100</span><div class="bar"><i id="hp2" style="width:100%"></i></div></div></div><button class="button" id="mpx">✕ Leave</button><div class="mpb"><div class="sel" id="mpsel">Tap a bone</div><button class="button primary" id="mplock" disabled>Lock in</button></div>`;
     document.querySelector('.viewer').appendChild(ui);
     ui.querySelector('#mplock').onclick = () => lock(); ui.querySelector('#mpx').onclick = leave; round();
   }
   const T = (id, t) => { const e = ui && ui.querySelector(id); if (e) e.textContent = t; };
   function round() {
     Object.assign(G, { target: G.targets[G.r], sel: null, locked: false, myS: null, oppS: null, oppAt: null, oppPick: null, busy: false, t0: performance.now() });
-    Q().clearMarks(); Q().resetCam(); T('#mpr', `Round ${G.r + 1} / ${ROUNDS}`); T('#mpq', 'Find the ' + G.target); T('#mpsel', 'Tap a bone'); T('#mpk', '');
+    clearHalos(); ui.classList.remove('urgent'); ui.querySelector('#mpal').className = 'al'; Q().clearMarks(); Q().resetCam(); T('#mpr', `Round ${G.r + 1} / ${ROUNDS}`); T('#mpq', 'Find the ' + G.target); T('#mpsel', 'Tap a bone'); T('#mpk', '');
     const l = ui.querySelector('#mplock'); l.disabled = true; l.textContent = 'Lock in';
     if (G.bot) { G.botAt = G.t0 + (4 + Math.random() * 14 * (1 - .4 * G.skill)) * 1000; G.botPick = botPick(G.target, G.skill); }
     clearInterval(G.iv); G.iv = setInterval(tick, 200);
@@ -130,7 +143,12 @@
     if (!G) return; const now = performance.now(); let left = 30 - (now - G.t0) / 1000;
     if (G.bot && G.oppS == null && now >= G.botAt) { G.oppPick = G.botPick; G.oppS = points(G.botPick, G.target); G.oppAt = now; }
     if (G.oppAt && !G.locked) left = Math.min(left, 10 - (now - G.oppAt) / 1000);
-    T('#mpk', G.locked ? 'Waiting for ' + G.oppName + '…' : (G.oppAt ? '⚡ ' + G.oppName + ' locked in! ' : '⏱ ') + Math.max(0, Math.ceil(left)) + 's');
+    T('#mpk', '⏱ ' + Math.max(0, Math.ceil(left)) + 's left in the round');
+    const al = ui.querySelector('#mpal'); let l = null, cls = 'al show';
+    if (!G.locked && G.oppAt) { l = Math.max(0, 10 - (now - G.oppAt) / 1000); cls += l <= 3 ? ' hot' : l <= 5 ? ' warn' : ''; al.innerHTML = `🟠 ${esc(G.oppName)} locked in! <b>${Math.ceil(l)}s</b> to lock yours<div class="alb"><i style="width:${l * 10}%"></i></div>`; ui.classList.toggle('urgent', l <= 5); }
+    else if (G.locked && G.oppS == null) { l = Math.max(0, Math.min(10 - (now - G.lockedAt) / 1000, 30 - (now - G.t0) / 1000)); cls += ' me'; al.innerHTML = `🔵 You locked in. ${esc(G.oppName)} has <b>${Math.ceil(l)}s</b><div class="alb"><i style="width:${l * 10}%"></i></div>`; ui.classList.remove('urgent'); }
+    else { cls = 'al'; ui.classList.remove('urgent'); }
+    al.className = cls;
     if (left <= 0 && !G.locked) lock();
     if (G.locked && G.oppS == null && (now - G.t0) / 1000 >= 30 && G.bot) { G.oppS = 0; G.oppAt = now; }
     if (G.locked && G.oppS == null && !G.bot && now - Math.max(G.t0 + 30000, G.lockedAt + 10000) > 5000) G.oppS = 0;
@@ -145,8 +163,11 @@
   function reveal() {
     G.busy = true; clearInterval(G.iv); const a = G.myS, b = G.oppS, dmg = Math.round(Math.abs(a - b) / 10 * MULT[G.r]);
     if (a > b) G.oppHp = Math.max(0, G.oppHp - dmg); else if (b > a) G.myHp = Math.max(0, G.myHp - dmg);
-    Q().clearMarks(); if (G.oppPick && G.oppPick !== G.target) Q().mark(G.oppPick, 'sel'); if (G.sel && G.sel !== G.target) Q().mark(G.sel, 'bad'); Q().mark(G.target, 'ok'); Q().fit(G.target);
-    T('#mpq', 'It was the ' + G.target); T('#mpsel', `You: ${why(a)} +${a} · ${G.oppName}: ${why(b)} +${b}${dmg ? ' · ' + (a > b ? G.oppName : 'You') + ' −' + dmg + ' HP' : ''}`); T('#mpk', '');
+    ui.querySelector('#mpal').className = 'al'; ui.classList.remove('urgent'); Q().clearMarks(); clearHalos();
+    if (!(G.sel === G.target || G.oppPick === G.target)) tint(G.target, GOLD, .55);
+    if (G.oppPick) tint(G.oppPick, OPP); if (G.sel) tint(G.sel, G.sel === G.oppPick ? BOTH : ME); halo(G.target); Q().fit(G.target);
+    T('#mpq', 'It was the ' + G.target); T('#mpk', '');
+    H('#mpsel', `<div>🔵 You: <b>${esc(G.sel || 'no pick')}</b> · ${why(a)} +${a}</div><div>🟠 ${esc(G.oppName)}: <b>${esc(G.oppPick || 'no pick')}</b> · ${why(b)} +${b}</div><div>🟡 Answer: <b>${esc(G.target)}</b></div>${dmg ? '<div>' + (a > b ? esc(G.oppName) : 'You') + ' −' + dmg + ' HP</div>' : ''}`);
     [[1, G.myHp], [2, G.oppHp]].forEach(([i, v]) => { T('#ht' + i, v); ui.querySelector('#hp' + i).style.width = v + '%'; });
     const over = G.myHp <= 0 || G.oppHp <= 0 || G.r >= ROUNDS - 1, g = G;
     setTimeout(() => { if (G !== g) return; if (over) finish(); else { G.r++; round(); } }, 4500);
@@ -166,7 +187,7 @@
     if (G.ch) ch.send({ type: 'broadcast', event: 'm', payload: { t: 'leave' } }); exit();
   }
   function exit() {
-    clearInterval(G && G.iv); clearTimeout(leaveT); document.body.classList.remove('mp-on'); Q().mpActive = false; if (ui) ui.remove(); ui = null;
+    clearInterval(G && G.iv); clearTimeout(leaveT); clearHalos(); document.body.classList.remove('mp-on'); Q().mpActive = false; if (ui) ui.remove(); ui = null;
     Q().clearMarks(); Q().resetCam(); if (ch) { ch.unsubscribe(); ch = null; } G = null; Q().showHome(); open();
   }
   function forfeitWin() { if (G && !G.done) { G.oppHp = 0; G.busy = true; finish(); } }
@@ -213,7 +234,7 @@
       const A = Q(), r = cv.getBoundingClientRect(), rc = new A.THREE.Raycaster();
       rc.setFromCamera(new A.THREE.Vector2((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1), A.camera);
       const h = rc.intersectObjects(A.meshes().filter(x => x.visible && x.userData.layer === 'bone'), false); if (!h.length) return;
-      G.sel = h[0].object.userData.key; A.clearMarks(); A.mark(G.sel, 'ok'); T('#mpsel', G.sel);
+      G.sel = h[0].object.userData.key; A.clearMarks(); tint(G.sel, ME); T('#mpsel', '🔵 ' + G.sel);
       const l = ui.querySelector('#mplock'); l.disabled = false;
     });
   })();
