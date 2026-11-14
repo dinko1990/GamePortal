@@ -88,7 +88,7 @@
 
 
   /* ================= MATCH ENGINE: bot + friend ================= */
-  const MP_VER = '1.4'; // both players must run the same version of this file
+  const MP_VER = '1.5'; // both players must run the same version of this file
   const Q = () => window.AQ, EASY = /femur|humerus|tibia|fibula|radius|ulna|clavicle|scapula|sternum|mandible|patella|sacrum|skull|pelvis|ribs/i;
   const MULT = [1, 1, 1.5, 2, 2.5], ROUNDS = 5, boxes = {};
   let G = null, ch = null, ui = null, pendingRoom = new URLSearchParams(location.search).get('room'), leaveT = null;
@@ -102,9 +102,13 @@
   function pickTargets() { const all = Q().KEYS().filter(k => k.layer === 'bone').map(k => k.key), easy = all.filter(k => EASY.test(k)), t = []; while (t.length < ROUNDS) t.push(rnd((t.length < 2 && easy.length > 3 ? easy : all).filter(k => !t.includes(k)))); return t; }
   function botPick(t, skill) { if (Math.random() < .25 + .5 * skill) return t; const near = Q().KEYS().filter(k => k.layer === 'bone' && k.key !== t).map(k => [gap(k.key, t), k.key]).sort((a, b) => a[0] - b[0]).slice(0, 8); return rnd(near)[1]; }
 
-  const MCSS = `@keyframes mpp{from{opacity:.7}to{opacity:1}}.mpt .hp:first-child{border-left:5px solid #3b82f6}.mpt .hp:last-child{border-left:5px solid #f97316}#hp1{background:#3b82f6!important}#hp2{background:#f97316!important}.al{display:none;margin-top:6px;padding:6px 10px;border-radius:10px;font-weight:800;font-size:14px;color:#fff;background:#f97316}.al.show{display:block}.al.me{background:#3b82f6}.al.warn{animation:mpp .9s infinite alternate}.al.hot{font-size:19px;background:#ea580c;animation:mpp .45s infinite alternate}.al .alb{height:5px;background:#fff4;border-radius:5px;margin-top:4px;overflow:hidden}.al .alb i{display:block;height:100%;background:#fff}#mpg.urgent::after{content:'';position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 44px 8px rgba(249,115,22,.55);animation:mpp .7s infinite alternate}@media(prefers-reduced-motion:reduce){.al,#mpg::after{animation:none!important}}.mp-on .hud,.mp-on .answers,.mp-on #wi,.mp-on #focusbtn,.mp-on .top,.mp-on .side,.mp-on .footer{display:none!important}.mp-on .layout{grid-template-columns:1fr!important}
+  const MCSS = `.mpt .hp,.mpt .mc,.mpt .mq{background:var(--glass);border:1px solid var(--line);border-radius:14px;padding:6px 10px;font-weight:800;font-size:13px}.mpt .hp{flex:0 0 31%;min-width:0}.mpt .mc{flex:1;min-width:0;text-align:center;line-height:1.25}.mpt .mq{flex:1 1 100%;text-align:center}
+.mpt .r1{display:flex;justify-content:space-between;gap:4px}.mpt .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#mpq{font-size:clamp(15px,4.6vw,20px)}
+@media(max-width:600px){.mpt{top:6px;left:6px;right:48px;gap:5px}.mpt .hp{flex:0 0 29%;padding:4px 7px;font-size:11px;border-radius:10px}.mpt .mc{padding:3px 4px;font-size:11px;border-radius:10px}.mpt .mq{padding:4px 8px;border-radius:10px}.mpt .bar{height:6px!important;margin:3px 0 0!important}.al{font-size:12px;padding:4px 8px;margin-top:4px}.al.hot{font-size:15px}
+#mpx{top:48px;right:6px;width:36px;height:36px;padding:0;font-size:0}#mpx::before{content:'✕';font-size:15px}.mpb{bottom:8px;gap:5px}.mpb .sel{font-size:11px;line-height:1.3;padding:4px 8px}.mpb .button.primary{padding:10px;width:min(260px,70%);font-size:15px}}
+@keyframes mpp{from{opacity:.7}to{opacity:1}}.mpt .hp:first-child{border-left:5px solid #3b82f6}.mpt .hp:last-child{border-left:5px solid #f97316}#hp1{background:#3b82f6!important}#hp2{background:#f97316!important}.al{display:none;margin-top:6px;padding:6px 10px;border-radius:10px;font-weight:800;font-size:14px;color:#fff;background:#f97316}.al.show{display:block}.al.me{background:#3b82f6}.al.warn{animation:mpp .9s infinite alternate}.al.hot{font-size:19px;background:#ea580c;animation:mpp .45s infinite alternate}.al .alb{height:5px;background:#fff4;border-radius:5px;margin-top:4px;overflow:hidden}.al .alb i{display:block;height:100%;background:#fff}#mpg.urgent::after{content:'';position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 44px 8px rgba(249,115,22,.55);animation:mpp .7s infinite alternate}@media(prefers-reduced-motion:reduce){.al,#mpg::after{animation:none!important}}.mp-on .hud,.mp-on .answers,.mp-on #wi,.mp-on #focusbtn,.mp-on .top,.mp-on .side,.mp-on .footer{display:none!important}.mp-on .layout{grid-template-columns:1fr!important}
 #mpg{position:absolute;inset:0;pointer-events:none;font-family:inherit}#mpg .mpt,#mpg .mpb,#mpg .sel{pointer-events:none}#mpg button,#mpg .mpres,#mpg .mpres *{pointer-events:auto}.mpt{position:absolute;top:8px;left:8px;right:54px;display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start}
-.mpt .hp,.mpt .mc{background:var(--glass);border:1px solid var(--line);border-radius:14px;padding:7px 10px;font-size:13px;font-weight:800}.mpt .hp{flex:1;min-width:120px}.mpt .mc{flex:2;min-width:170px;text-align:center}.mpt .bar{height:9px;background:var(--btn);border-radius:9px;overflow:hidden;margin:4px 0}.mpt .bar i{display:block;height:100%;background:var(--ok);transition:width .5s}
+.mpt .bar{height:9px;background:var(--btn);border-radius:9px;overflow:hidden;margin:4px 0}.mpt .bar i{display:block;height:100%;background:var(--ok);transition:width .5s}
 .mpb{position:absolute;left:0;right:0;bottom:14px;display:flex;flex-direction:column;align-items:center;gap:8px}.mpb .sel{background:var(--glass);border-radius:12px;padding:6px 12px;font-weight:800;font-size:14px;max-width:90%;text-align:center}.mpb .button.primary{width:min(320px,80%);margin:0;padding:14px}
 .mpres{position:absolute;inset:0;background:#0009;display:grid;place-items:center;padding:16px}.mpres .card{width:min(360px,100%);text-align:center}#mpx{position:absolute;top:54px;right:8px;padding:6px 10px;font-size:12px}`;
 
@@ -128,7 +132,7 @@
     if (!document.getElementById('mpcss')) { const s = document.createElement('style'); s.id = 'mpcss'; s.textContent = MCSS; document.head.appendChild(s); }
     document.body.classList.add('mp-on'); Q().mpActive = true; Q().setLayer('bone'); Q().showApp(); screen.style.display = 'none';
     ui = document.createElement('div'); ui.id = 'mpg';
-    ui.innerHTML = `<div class="mpt"><div class="hp"><span>🔵 ${esc(nick)}</span> <span id="ht1">100</span><div class="bar"><i id="hp1" style="width:100%"></i></div></div><div class="mc"><div id="mpr"></div><div id="mpq" style="font-size:18px"></div><div id="mpk" class="muted"></div><div id="mpal" class="al"></div></div><div class="hp"><span>🟠 ${esc(G.oppName)}</span> <span id="ht2">100</span><div class="bar"><i id="hp2" style="width:100%"></i></div></div></div><button class="button" id="mpx">✕ Leave</button><div class="mpb"><div class="sel" id="mpsel">Tap a bone</div><button class="button primary" id="mplock" disabled>Lock in</button></div>`;
+    ui.innerHTML = `<div class="mpt"><div class="hp"><div class="r1"><span class="nm">🔵 ${esc(nick)}</span><span id="ht1">100</span></div><div class="bar"><i id="hp1" style="width:100%"></i></div></div><div class="mc"><div id="mpr"></div><div id="mpk" class="muted"></div></div><div class="hp"><div class="r1"><span class="nm">🟠 ${esc(G.oppName)}</span><span id="ht2">100</span></div><div class="bar"><i id="hp2" style="width:100%"></i></div></div><div class="mq"><div id="mpq"></div><div id="mpal" class="al"></div></div></div><button class="button" id="mpx">✕ Leave</button><div class="mpb"><div class="sel" id="mpsel">Tap a bone</div><button class="button primary" id="mplock" disabled>Lock in</button></div>`;
     document.querySelector('.viewer').appendChild(ui);
     ui.querySelector('#mplock').onclick = () => lock(); ui.querySelector('#mpx').onclick = leave; round();
   }
@@ -144,7 +148,7 @@
     if (!G) return; const now = performance.now(); let left = 30 - (now - G.t0) / 1000;
     if (G.bot && G.oppS == null && now >= G.botAt) { G.oppPick = G.botPick; G.oppS = points(G.botPick, G.target); G.oppAt = now; }
     if (G.oppAt && !G.locked) left = Math.min(left, 10 - (now - G.oppAt) / 1000);
-    T('#mpk', '⏱ ' + Math.max(0, Math.ceil(left)) + 's left in the round');
+    T('#mpk', '⏱ ' + Math.max(0, Math.ceil(left)) + 's');
     const al = ui.querySelector('#mpal'); let l = null, cls = 'al show';
     if (!G.locked && G.oppAt) { l = Math.max(0, 10 - (now - G.oppAt) / 1000); cls += l <= 3 ? ' hot' : l <= 5 ? ' warn' : ''; al.innerHTML = `🟠 ${esc(G.oppName)} locked in! <b>${Math.ceil(l)}s</b> to lock yours<div class="alb"><i style="width:${l * 10}%"></i></div>`; ui.classList.toggle('urgent', l <= 5); }
     else if (G.locked && G.oppS == null) { l = Math.max(0, Math.min(10 - (now - G.lockedAt) / 1000, 30 - (now - G.t0) / 1000)); cls += ' me'; al.innerHTML = `🔵 You locked in. ${esc(G.oppName)} has <b>${Math.ceil(l)}s</b><div class="alb"><i style="width:${l * 10}%"></i></div>`; ui.classList.remove('urgent'); }
@@ -235,7 +239,7 @@
       const A = Q(), r = cv.getBoundingClientRect(), rc = new A.THREE.Raycaster();
       rc.setFromCamera(new A.THREE.Vector2((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1), A.camera);
       const h = rc.intersectObjects(A.meshes().filter(x => x.visible && x.userData.layer === 'bone'), false); if (!h.length) return;
-      G.sel = h[0].object.userData.key; A.clearMarks(); tint(G.sel, ME); T('#mpsel', '🔵 ' + G.sel);
+      G.sel = h[0].object.userData.key; A.clearMarks(); tint(G.sel, ME); T('#mpsel', '🔵 Bone selected');
       const l = ui.querySelector('#mplock'); l.disabled = false;
     });
   })();
