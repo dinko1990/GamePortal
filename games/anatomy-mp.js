@@ -102,10 +102,10 @@
   function botPick(t, skill) { if (Math.random() < .25 + .5 * skill) return t; const near = Q().KEYS().filter(k => k.layer === 'bone' && k.key !== t).map(k => [gap(k.key, t), k.key]).sort((a, b) => a[0] - b[0]).slice(0, 8); return rnd(near)[1]; }
 
   const MCSS = `.mp-on .hud,.mp-on .answers,.mp-on #wi,.mp-on #focusbtn,.mp-on .top,.mp-on .side,.mp-on .footer{display:none!important}.mp-on .layout{grid-template-columns:1fr!important}
-#mpg{position:absolute;inset:0;pointer-events:none;font-family:inherit}#mpg>*{pointer-events:auto}.mpt{position:absolute;top:8px;left:8px;right:54px;display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start}
+#mpg{position:absolute;inset:0;pointer-events:none;font-family:inherit}#mpg .mpt,#mpg .mpb,#mpg .sel{pointer-events:none}#mpg button,#mpg .mpres,#mpg .mpres *{pointer-events:auto}.mpt{position:absolute;top:8px;left:8px;right:54px;display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start}
 .mpt .hp,.mpt .mc{background:var(--glass);border:1px solid var(--line);border-radius:14px;padding:7px 10px;font-size:13px;font-weight:800}.mpt .hp{flex:1;min-width:120px}.mpt .mc{flex:2;min-width:170px;text-align:center}.mpt .bar{height:9px;background:var(--btn);border-radius:9px;overflow:hidden;margin:4px 0}.mpt .bar i{display:block;height:100%;background:var(--ok);transition:width .5s}
 .mpb{position:absolute;left:0;right:0;bottom:14px;display:flex;flex-direction:column;align-items:center;gap:8px}.mpb .sel{background:var(--glass);border-radius:12px;padding:6px 12px;font-weight:800;font-size:14px;max-width:90%;text-align:center}.mpb .button.primary{width:min(320px,80%);margin:0;padding:14px}
-.mpres{position:absolute;inset:0;background:#0009;display:grid;place-items:center;padding:16px}.mpres .card{width:min(360px,100%);text-align:center}#mpx{position:absolute;left:8px;bottom:14px;padding:8px 12px}`;
+.mpres{position:absolute;inset:0;background:#0009;display:grid;place-items:center;padding:16px}.mpres .card{width:min(360px,100%);text-align:center}#mpx{position:absolute;top:54px;right:8px;padding:6px 10px;font-size:12px}`;
 
   async function begin(o) {
     if (!Q() || !Q().ready()) { alert('The 3D model is still loading. Try again in a moment.'); return; }
@@ -204,6 +204,19 @@
     ch.on('presence', { event: 'leave' }, () => { if (G && G.ch && !G.done) { clearTimeout(leaveT); leaveT = setTimeout(() => { if (players().length < 2) forfeitWin(); }, 20000); } });
     ch.subscribe(async st => { if (st === 'SUBSCRIBED') await ch.track({ nick, uid }); });
   }
+  // tap a bone -> it turns green (same feel as the normal Find it mode); Lock in makes it final
+  (function () {
+    const cv = document.getElementById('scene'); if (!cv) return; let dn = null;
+    cv.addEventListener('pointerdown', e => { dn = { x: e.clientX, y: e.clientY }; });
+    cv.addEventListener('pointerup', e => {
+      const d = dn; dn = null; if (!G || G.locked || G.busy || G.done || !d || Math.hypot(e.clientX - d.x, e.clientY - d.y) > 8) return;
+      const A = Q(), r = cv.getBoundingClientRect(), rc = new A.THREE.Raycaster();
+      rc.setFromCamera(new A.THREE.Vector2((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1), A.camera);
+      const h = rc.intersectObjects(A.meshes().filter(x => x.visible && x.userData.layer === 'bone'), false); if (!h.length) return;
+      G.sel = h[0].object.userData.key; A.clearMarks(); A.mark(G.sel, 'ok'); T('#mpsel', G.sel);
+      const l = ui.querySelector('#mplock'); l.disabled = false;
+    });
+  })();
   if (pendingRoom) setTimeout(() => open(), 800);
 
   if (window.Arcade) Arcade.onChange(() => { if (screen && screen.style.display === 'block') open(); });
