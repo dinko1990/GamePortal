@@ -54,7 +54,7 @@
       const t = tier(rating.rating), next = RANKS[t + 1], base = RANKS[t][0];
       const pct = next ? Math.min(100, Math.round((rating.rating - base) / (next[0] - base) * 100)) : 100;
       h += `<div class="card"><div class="row"><div><div class="muted">Playing as</div><b style="font-size:18px">${esc(nick)}</b></div><div style="text-align:right"><div class="big">${RANKS[t][2]} ${RANKS[t][1]}</div><div class="muted">Rating ${rating.rating} · ${rating.wins} wins / ${rating.matches} matches</div></div></div><div class="bar"><i style="width:${pct}%"></i></div><div class="muted">${next ? (next[0] - rating.rating) + ' points to ' + next[1] : 'Top rank reached!'}</div></div>`;
-      h += `<div class="card"><div class="row"><b>🎯 Find it · Bones</b><span class="muted">Ranked</span></div><div class="muted" style="margin:6px 0">Find the named bone before your opponent. First to lock in starts a 10-second timer for the other player.</div><div class="row"><button class="button primary" disabled style="margin:0">Play vs random · next step</button><button class="button" disabled>Invite a friend · soon</button></div></div>`;
+      h += `<div class="card"><div class="row"><b>🎯 Find it · Bones</b><span class="muted">Ranked</span></div><div class="muted" style="margin:6px 0">Find the named bone before your opponent. First to lock in starts a 10-second timer for the other player.</div><div class="row"><button class="button primary" id="mpbot" style="margin:0">Play vs random</button><button class="button" id="mpinv">Invite a friend</button></div><div class="row" style="margin-top:8px"><input id="mpcode" maxlength="6" placeholder="Room code" style="margin:0;text-transform:uppercase"><button class="button" id="mpjoin">Join</button></div></div>`;
       h += '<div class="card"><b>Coming soon</b><div class="muted" style="margin-bottom:8px">Tap "I want this" to tell us which mode to build next.</div>';
       LOCKED.forEach(([k, t2]) => { h += `<div class="row lock" style="padding:6px 0"><span>🔒 ${t2}</span><span class="row" style="gap:8px"><span class="muted">${votes[k] || 0} votes</span><button class="button" data-vote="${k}" ${mine.has(k) ? 'disabled' : ''}>${mine.has(k) ? '✓ Voted' : 'I want this'}</button></span></div>`; });
       h += '</div>';
@@ -64,6 +64,7 @@
     }
     screen.innerHTML = h + '</div>';
     $('#mpback').onclick = () => { screen.style.display = 'none'; };
+    const bb = $('#mpbot'); if (bb) { bb.onclick = () => startBot(); $('#mpinv').onclick = () => room(); $('#mpjoin').onclick = () => { const c = $('#mpcode').value.trim().toUpperCase(); if (c.length === 6) room(c); }; }
     const lg = $('#mplogin'); if (lg) lg.onclick = () => window.Arcade && Arcade.open();
     const sv = $('#mpsave'); if (sv) sv.onclick = async () => {
       const v = $('#mpnick').value.trim(); sv.textContent = 'Saving…';
@@ -80,8 +81,130 @@
   async function open() {
     screen.style.display = 'block'; screen.innerHTML = '<div class="wrap"><p class="muted">Loading…</p></div>';
     if (window.Arcade) await Arcade.ready;
-    await load(); render();
+    await load();
+    if (pendingRoom && nick) { const c = pendingRoom; pendingRoom = null; return room(c); }
+    render();
   }
+
+
+  /* ================= MATCH ENGINE: bot + friend ================= */
+  const Q = () => window.AQ, EASY = /femur|humerus|tibia|fibula|radius|ulna|clavicle|scapula|sternum|mandible|patella|sacrum|skull|pelvis|ribs/i;
+  const MULT = [1, 1, 1.5, 2, 2.5], ROUNDS = 5, boxes = {};
+  let G = null, ch = null, ui = null, pendingRoom = new URLSearchParams(location.search).get('room'), leaveT = null;
+  if (pendingRoom) pendingRoom = pendingRoom.toUpperCase().slice(0, 6);
+  const rnd = a => a[Math.floor(Math.random() * a.length)], sleep = ms => new Promise(r => setTimeout(r, ms));
+  const boxesOf = k => boxes[k] || (boxes[k] = Q().meshes().filter(m => m.userData.key === k && m.userData.layer === 'bone').map(m => new (Q().THREE.Box3)().setFromObject(m)));
+  function gap(a, b) { let g = 1e9; for (const x of boxesOf(a)) for (const y of boxesOf(b)) g = Math.min(g, Math.hypot(Math.max(0, x.min.x - y.max.x, y.min.x - x.max.x), Math.max(0, x.min.y - y.max.y, y.min.y - x.max.y), Math.max(0, x.min.z - y.max.z, y.min.z - x.max.z))); return g; }
+  // 1000 = the target itself, 500 = touching it, 250 = within 10 cm, 100 = within 25 cm
+  function points(pick, target) { if (!pick) return 0; if (pick === target) return 1000; const d = gap(pick, target); return d <= 0.5 ? 500 : d <= 10 ? 250 : d <= 25 ? 100 : 0; }
+  const why = s => s >= 1000 ? 'Perfect' : s >= 500 ? 'Touching' : s >= 250 ? 'Within 10 cm' : s >= 100 ? 'Within 25 cm' : s === 0 ? 'Missed' : '';
+  function pickTargets() { const all = Q().KEYS().filter(k => k.layer === 'bone').map(k => k.key), easy = all.filter(k => EASY.test(k)), t = []; while (t.length < ROUNDS) t.push(rnd((t.length < 2 && easy.length > 3 ? easy : all).filter(k => !t.includes(k)))); return t; }
+  function botPick(t, skill) { if (Math.random() < .25 + .5 * skill) return t; const near = Q().KEYS().filter(k => k.layer === 'bone' && k.key !== t).map(k => [gap(k.key, t), k.key]).sort((a, b) => a[0] - b[0]).slice(0, 8); return rnd(near)[1]; }
+
+  const MCSS = `.mp-on .hud,.mp-on .answers,.mp-on #wi,.mp-on #focusbtn,.mp-on .top,.mp-on .side,.mp-on .footer{display:none!important}.mp-on .layout{grid-template-columns:1fr!important}
+#mpg{position:absolute;inset:0;pointer-events:none;font-family:inherit}#mpg>*{pointer-events:auto}.mpt{position:absolute;top:8px;left:8px;right:54px;display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start}
+.mpt .hp,.mpt .mc{background:var(--glass);border:1px solid var(--line);border-radius:14px;padding:7px 10px;font-size:13px;font-weight:800}.mpt .hp{flex:1;min-width:120px}.mpt .mc{flex:2;min-width:170px;text-align:center}.mpt .bar{height:9px;background:var(--btn);border-radius:9px;overflow:hidden;margin:4px 0}.mpt .bar i{display:block;height:100%;background:var(--ok);transition:width .5s}
+.mpb{position:absolute;left:0;right:0;bottom:14px;display:flex;flex-direction:column;align-items:center;gap:8px}.mpb .sel{background:var(--glass);border-radius:12px;padding:6px 12px;font-weight:800;font-size:14px;max-width:90%;text-align:center}.mpb .button.primary{width:min(320px,80%);margin:0;padding:14px}
+.mpres{position:absolute;inset:0;background:#0009;display:grid;place-items:center;padding:16px}.mpres .card{width:min(360px,100%);text-align:center}#mpx{position:absolute;left:8px;bottom:14px;padding:8px 12px}`;
+
+  async function begin(o) {
+    if (!Q() || !Q().ready()) { alert('The 3D model is still loading. Try again in a moment.'); return; }
+    if (ui) ui.remove(); clearInterval(G && G.iv);
+    G = Object.assign({ r: 0, myHp: 100, oppHp: 100, targets: pickTargets() }, o);
+    if (!document.getElementById('mpcss')) { const s = document.createElement('style'); s.id = 'mpcss'; s.textContent = MCSS; document.head.appendChild(s); }
+    document.body.classList.add('mp-on'); Q().mpActive = true; Q().setLayer('bone'); Q().showApp(); screen.style.display = 'none';
+    ui = document.createElement('div'); ui.id = 'mpg';
+    ui.innerHTML = `<div class="mpt"><div class="hp"><span>${esc(nick)}</span> <span id="ht1">100</span><div class="bar"><i id="hp1" style="width:100%"></i></div></div><div class="mc"><div id="mpr"></div><div id="mpq" style="font-size:18px"></div><div id="mpk" class="muted"></div></div><div class="hp"><span>${esc(G.oppName)}</span> <span id="ht2">100</span><div class="bar"><i id="hp2" style="width:100%"></i></div></div></div><button class="button" id="mpx">✕ Leave</button><div class="mpb"><div class="sel" id="mpsel">Tap a bone</div><button class="button primary" id="mplock" disabled>Lock in</button></div>`;
+    document.querySelector('.viewer').appendChild(ui);
+    ui.querySelector('#mplock').onclick = () => lock(); ui.querySelector('#mpx').onclick = leave; round();
+  }
+  const T = (id, t) => { const e = ui && ui.querySelector(id); if (e) e.textContent = t; };
+  function round() {
+    Object.assign(G, { target: G.targets[G.r], sel: null, locked: false, myS: null, oppS: null, oppAt: null, oppPick: null, busy: false, t0: performance.now() });
+    Q().clearMarks(); Q().resetCam(); T('#mpr', `Round ${G.r + 1} / ${ROUNDS}`); T('#mpq', 'Find the ' + G.target); T('#mpsel', 'Tap a bone'); T('#mpk', '');
+    const l = ui.querySelector('#mplock'); l.disabled = true; l.textContent = 'Lock in';
+    if (G.bot) { G.botAt = G.t0 + (4 + Math.random() * 14 * (1 - .4 * G.skill)) * 1000; G.botPick = botPick(G.target, G.skill); }
+    clearInterval(G.iv); G.iv = setInterval(tick, 200);
+  }
+  function tick() {
+    if (!G) return; const now = performance.now(); let left = 30 - (now - G.t0) / 1000;
+    if (G.bot && G.oppS == null && now >= G.botAt) { G.oppPick = G.botPick; G.oppS = points(G.botPick, G.target); G.oppAt = now; }
+    if (G.oppAt && !G.locked) left = Math.min(left, 10 - (now - G.oppAt) / 1000);
+    T('#mpk', G.locked ? 'Waiting for ' + G.oppName + '…' : (G.oppAt ? '⚡ ' + G.oppName + ' locked in! ' : '⏱ ') + Math.max(0, Math.ceil(left)) + 's');
+    if (left <= 0 && !G.locked) lock();
+    if (G.locked && G.oppS == null && (now - G.t0) / 1000 >= 30 && G.bot) { G.oppS = 0; G.oppAt = now; }
+    if (G.locked && G.oppS == null && !G.bot && now - Math.max(G.t0 + 30000, G.lockedAt + 10000) > 5000) G.oppS = 0;
+    if (G.locked && G.oppS != null && !G.busy) reveal();
+  }
+  function lock() {
+    if (!G || G.locked) return; G.locked = true; G.lockedAt = performance.now(); G.myS = points(G.sel, G.target);
+    if (G.bot) G.botAt = Math.min(G.botAt, G.lockedAt + 10000);
+    if (G.ch) ch.send({ type: 'broadcast', event: 'm', payload: { t: 'lock', r: G.r, pick: G.sel, s: G.myS } });
+    const l = ui.querySelector('#mplock'); l.disabled = true; l.textContent = 'Locked ✓';
+  }
+  function reveal() {
+    G.busy = true; clearInterval(G.iv); const a = G.myS, b = G.oppS, dmg = Math.round(Math.abs(a - b) / 10 * MULT[G.r]);
+    if (a > b) G.oppHp = Math.max(0, G.oppHp - dmg); else if (b > a) G.myHp = Math.max(0, G.myHp - dmg);
+    Q().clearMarks(); if (G.oppPick && G.oppPick !== G.target) Q().mark(G.oppPick, 'sel'); if (G.sel && G.sel !== G.target) Q().mark(G.sel, 'bad'); Q().mark(G.target, 'ok'); Q().fit(G.target);
+    T('#mpq', 'It was the ' + G.target); T('#mpsel', `You: ${why(a)} +${a} · ${G.oppName}: ${why(b)} +${b}${dmg ? ' · ' + (a > b ? G.oppName : 'You') + ' −' + dmg + ' HP' : ''}`); T('#mpk', '');
+    [[1, G.myHp], [2, G.oppHp]].forEach(([i, v]) => { T('#ht' + i, v); ui.querySelector('#hp' + i).style.width = v + '%'; });
+    const over = G.myHp <= 0 || G.oppHp <= 0 || G.r >= ROUNDS - 1, g = G;
+    setTimeout(() => { if (G !== g) return; if (over) finish(); else { G.r++; round(); } }, 4500);
+  }
+  async function finish() {
+    clearInterval(G.iv); const win = G.myHp > G.oppHp ? 1 : G.myHp < G.oppHp ? -1 : 0; let d = null;
+    if (G.rated && G.matchId && !G.reported) { G.reported = true; const { data } = await Arcade.sb.rpc('finish_match', { p_match: G.matchId, in_p1_hp: G.myHp, in_p2_hp: G.oppHp }); if (data) d = data.p1_delta; }
+    if (!ui) return; const r = document.createElement('div'); r.className = 'mpres';
+    r.innerHTML = `<div class="card"><div class="big">${win > 0 ? '🏆 Victory!' : win < 0 ? 'Defeat' : 'Draw'}</div><div class="muted">${esc(nick)} ${G.myHp} HP · ${esc(G.oppName)} ${G.oppHp} HP</div><div style="font-size:20px;font-weight:800;margin:10px 0">${d != null ? 'Rating ' + (d >= 0 ? '+' : '') + d : G.rated ? '' : 'Friendly match · not ranked'}</div><button class="button primary" id="mpre">Rematch</button><button class="button" id="mpmenu" style="width:100%;margin-top:8px">Back to menu</button></div>`;
+    ui.appendChild(r); G.done = true; r.querySelector('#mpmenu').onclick = exit;
+    r.querySelector('#mpre').onclick = () => { if (G.bot) startBot(true); else { G.me = true; ch.send({ type: 'broadcast', event: 'm', payload: { t: 'rematch' } }); r.querySelector('#mpre').textContent = 'Waiting for friend…'; maybeRematch(); } };
+  }
+  function maybeRematch() { if (G && G.ch && G.me && G.opp && G.host) { const t = pickTargets(); ch.send({ type: 'broadcast', event: 'm', payload: { t: 'start', targets: t, host: nick } }); begin({ ch: 1, host: 1, oppName: G.oppName, targets: t }); } }
+  async function leave() {
+    if (!G || !confirm('Leave the match? It counts as a loss.')) return;
+    if (G.rated && G.matchId && !G.reported && G.r > 0) { G.reported = true; await Arcade.sb.rpc('finish_match', { p_match: G.matchId, in_p1_hp: 0, in_p2_hp: G.oppHp }); }
+    if (G.ch) ch.send({ type: 'broadcast', event: 'm', payload: { t: 'leave' } }); exit();
+  }
+  function exit() {
+    clearInterval(G && G.iv); clearTimeout(leaveT); document.body.classList.remove('mp-on'); Q().mpActive = false; if (ui) ui.remove(); ui = null;
+    Q().clearMarks(); Q().resetCam(); if (ch) { ch.unsubscribe(); ch = null; } G = null; Q().showHome(); open();
+  }
+  function forfeitWin() { if (G && !G.done) { G.oppHp = 0; G.busy = true; finish(); } }
+
+  async function startBot(quick) {
+    if (!quick) { screen.innerHTML = '<div class="wrap"><div class="card" style="text-align:center"><div class="big">🔎</div><b>Searching for an opponent…</b></div></div>'; await sleep(2500); }
+    const br = rating.rating + Math.round((Math.random() - .5) * 120), skill = Math.max(.1, Math.min(.9, (br - 800) / 800)); let id = null;
+    const { data } = await Arcade.sb.from('matches').insert({ mode_key: ACTIVE, p1: Arcade.user.id, p2_is_bot: true, rated: true, status: 'playing' }).select('id').single(); if (data) id = data.id;
+    begin({ bot: true, skill, rated: !!id, matchId: id, oppName: '🤖 Bot' });
+  }
+
+  // ----- friend rooms (Supabase Realtime) -----
+  function showRoom(c, host) {
+    const link = location.origin + location.pathname + '?room=' + c;
+    screen.innerHTML = `<div class="wrap"><div class="card" style="text-align:center"><b>${host ? 'Invite a friend' : 'Joining room'}</b><div class="big" style="letter-spacing:8px;margin:8px 0">${c}</div><div class="muted">${host ? 'Send the code or link. The match starts when your friend joins.' : 'Waiting for the host…'}</div>${host ? `<input readonly value="${link}" style="margin-top:10px"><button class="button primary" id="mpcopy">Copy link</button>` : ''}<button class="button" id="mpcancel" style="width:100%;margin-top:8px">Cancel</button></div></div>`;
+    const cp = $('#mpcopy'); if (cp) cp.onclick = () => { navigator.clipboard && navigator.clipboard.writeText(link); cp.textContent = 'Copied ✓'; };
+    $('#mpcancel').onclick = () => { if (ch) { ch.unsubscribe(); ch = null; } open(); };
+  }
+  function room(code) {
+    const host = !code, c = code || Array.from({ length: 6 }, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.random() * 32 | 0]).join(''), uid = Arcade.user.id;
+    if (ch) ch.unsubscribe(); showRoom(c, host);
+    ch = Arcade.sb.channel('aq-' + c, { config: { broadcast: { self: false }, presence: { key: uid } } });
+    const players = () => Object.values(ch.presenceState()).flat();
+    ch.on('broadcast', { event: 'm' }, ({ payload: p }) => {
+      if (p.t === 'start') begin({ ch: 1, host: 0, oppName: G && G.oppName || p.host, targets: p.targets });
+      else if (!G) return;
+      else if (p.t === 'lock' && p.r === G.r && G.oppS == null) { G.oppS = p.s; G.oppPick = p.pick; G.oppAt = performance.now(); }
+      else if (p.t === 'rematch') { G.opp = true; maybeRematch(); }
+      else if (p.t === 'leave') forfeitWin();
+    });
+    ch.on('presence', { event: 'sync' }, () => {
+      const ps = players(); if (ps.length > 2 && !G) { alert('That room is full.'); ch.unsubscribe(); ch = null; open(); return; }
+      if (ps.length === 2) { clearTimeout(leaveT); if (host && !G) { const o = ps.find(p => p.uid !== uid), t = pickTargets(); ch.send({ type: 'broadcast', event: 'm', payload: { t: 'start', targets: t, host: nick } }); begin({ ch: 1, host: 1, oppName: o.nick, targets: t }); } }
+    });
+    ch.on('presence', { event: 'leave' }, () => { if (G && G.ch && !G.done) { clearTimeout(leaveT); leaveT = setTimeout(() => { if (players().length < 2) forfeitWin(); }, 20000); } });
+    ch.subscribe(async st => { if (st === 'SUBSCRIBED') await ch.track({ nick, uid }); });
+  }
+  if (pendingRoom) setTimeout(() => open(), 800);
 
   if (window.Arcade) Arcade.onChange(() => { if (screen && screen.style.display === 'block') open(); });
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount); else mount();
