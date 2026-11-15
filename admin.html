@@ -25,6 +25,8 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:8px 6px;t
 .pill{font-size:11px;font-weight:800;padding:3px 8px;border-radius:99px;background:var(--btn)}.pill.bl{background:var(--bad);color:#fff}
 .center{text-align:center;padding:60px 16px}.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:700;z-index:50;max-width:90%}.toast.err{background:var(--bad);color:#fff}
 .ov{position:fixed;inset:0;background:#0009;display:grid;place-items:center;padding:16px;z-index:40}.modal{background:var(--card);border-radius:18px;padding:20px;width:min(420px,100%);display:flex;flex-direction:column;gap:12px}
+
+.drag{cursor:grab;font-size:20px;touch-action:none;user-select:none;padding:0 6px 0 0;color:var(--mute)}.card.lift{opacity:.55;outline:2px dashed var(--acc)}
 details{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:14px}summary{cursor:pointer;font-weight:800}.form{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}[hidden]{display:none!important}
 </style></head><body>
 <header><h1>🎛️ Game Portal Admin</h1><span class="badge" id="role"></span><span class="mute" id="who"></span><button id="out">Log out</button></header>
@@ -68,15 +70,29 @@ function draw() {
 async function gamesTab() {
   const p = $('#pane'); p.innerHTML = '<div class="mute">Loading games…</div>';
   const gs = await rpc('admin_games');
-  p.innerHTML = '<div class="grid" id="gg"></div>' + (roles.god ? `<details><summary>＋ Add a game</summary><div class="form"><input id="ng_id" placeholder="id (e.g. snake)"><input id="ng_t" placeholder="Title"><input id="ng_k" placeholder="score name (optional)"><button class="pri" id="ng_b">Add</button></div><div class="mute" style="margin-top:8px">The id is the file name without .html. The score name is the game name used when saving scores.</div></details>` : '');
+  p.innerHTML = (roles.god ? '<div class="mute" style="margin-bottom:10px">Drag the ⠿ handle on a card to change the order. The portal follows this order.</div>' : '') + '<div class="grid" id="gg"></div>' + (roles.god ? `<details><summary>＋ Add a game</summary><div class="form"><input id="ng_id" placeholder="id (e.g. snake)"><input id="ng_t" placeholder="Title"><input id="ng_k" placeholder="score name (optional)"><button class="pri" id="ng_b">Add</button></div><div class="mute" style="margin-top:8px">The id is the file name without .html. The score name is the game name used when saving scores.</div></details>` : '');
   gs.forEach(g => $('#gg').appendChild(gameCard(g)));
+  if (roles.god) enableSort($('#gg'));
   if (!gs.length) $('#gg').innerHTML = '<div class="mute">No games yet.</div>';
   const nb = $('#ng_b'); if (nb) nb.onclick = async () => { const id = $('#ng_id').value.trim().toLowerCase(); if (!/^[a-z0-9-]{2,30}$/.test(id) || !$('#ng_t').value.trim()) return toast('Use an id like "my-game" and a title', true); await rpc('admin_upsert_game', { p_id: id, p_title: $('#ng_t').value.trim(), p_score_key: $('#ng_k').value.trim() }); toast('Game added'); gamesTab(); };
 }
+function enableSort(grid) {
+  let drag = null;
+  grid.addEventListener('pointerdown', e => { const h = e.target.closest('.drag'); if (!h) return; drag = h.closest('.card'); drag.classList.add('lift'); e.preventDefault(); });
+  window.addEventListener('pointermove', e => {
+    if (!drag) return; if (e.clientY < 80) scrollBy(0, -14); else if (e.clientY > innerHeight - 80) scrollBy(0, 14);
+    const el = document.elementFromPoint(e.clientX, e.clientY), over = el && el.closest('.card'); if (!over || over === drag || over.parentNode !== grid) return;
+    [...grid.children].indexOf(drag) < [...grid.children].indexOf(over) ? over.after(drag) : over.before(drag);
+  });
+  window.addEventListener('pointerup', async () => {
+    if (!drag) return; drag.classList.remove('lift'); drag = null;
+    try { await rpc('admin_reorder_games', { p_ids: [...grid.children].map(c => c.dataset.id) }); toast('Order saved'); } catch (e) { gamesTab(); }
+  });
+}
 function gameCard(g) {
-  const c = document.createElement('div'); c.className = 'card';
+  const c = document.createElement('div'); c.className = 'card'; c.dataset.id = g.id;
   const cur = g.currency || 'USD';
-  c.innerHTML = `<div class="row"><h3>${esc(g.title)}</h3><span class="mute">${esc(g.id)}</span></div>
+  c.innerHTML = `<div class="row"><h3>${roles.god ? '<span class="drag" title="Drag to reorder">⠿</span>' : ''}${esc(g.title)}</h3><span class="mute">${esc(g.id)}</span></div>
   <div class="seg">${Object.keys(STATUS).map(s => `<button data-s="${s}" class="${g.status === s ? 'on' : ''}">${STATUS[s]}</button>`).join('')}</div>
   <div class="mute" data-h>${HELP[g.status]}</div>
   <div data-price ${g.status === 'paid' ? '' : 'hidden'} style="display:flex;flex-direction:column;gap:8px">
