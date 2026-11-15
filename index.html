@@ -62,38 +62,25 @@ async function listGames(){
 }
 async function applyStatus(){
   await Arcade.ready; if(!Arcade.user)return;
-  const sb=Arcade.sb,[g,p,r]=await Promise.all([sb.from('games').select('id,title,status,price_cents,currency,sort_order'),sb.from('purchases').select('game_id'),sb.rpc('my_roles')]);
-  const own=new Set((p.data||[]).map(x=>x.game_id)),roles=r.data||{},rows=Object.fromEntries((g.data||[]).map(x=>[x.id,x]));
+  const sb=Arcade.sb,[g,p,r]=await Promise.all([sb.from('games').select('id,title,status,price_cents,currency,sort_order'),sb.from('purchases').select('game_id,expires_at'),sb.rpc('my_roles')]);
+  const buys=Object.fromEntries((p.data||[]).map(x=>[x.game_id,x.expires_at])),active=id=>id in buys&&(!buys[id]||new Date(buys[id])>new Date());
+  const roles=r.data||{},rows=Object.fromEntries((g.data||[]).map(x=>[x.id,x])),idOf=a=>decodeURIComponent(a.getAttribute('href')).split('/').pop().replace(/\.html?$/i,'').toLowerCase();
   document.querySelectorAll('a.game').forEach(a=>{
-    const id=decodeURIComponent(a.getAttribute('href')).split('/').pop().replace(/\.html?$/i,'').toLowerCase(),x=rows[id]; if(!x)return;
-    const admin=roles.god||(roles.games||[]).includes(id); a.querySelectorAll('.badge').forEach(b=>b.remove());
+    const id=idOf(a),x=rows[id]; if(!x)return;
+    const admin=roles.god||(roles.games||[]).includes(id); a.querySelectorAll('.badge').forEach(b=>b.remove()); a.style.borderColor='';
     if(x.status==='off'&&!admin){a.remove();return}
     if(x.title)a.querySelector('.name').textContent=x.title;
-    let t=''; if(x.status==='locked')t='🔒 Coming soon'; else if(x.status==='paid'&&!own.has(id))t='🛒 '+(x.price_cents/100).toLocaleString(undefined,{style:'currency',currency:x.currency||'USD'}); else if(x.status==='off')t='Hidden (admin view)';
-    if(t){const b=document.createElement('span');b.className='badge';b.textContent=t;a.appendChild(b)}
+    const price=(x.price_cents/100).toLocaleString(undefined,{style:'currency',currency:x.currency||'USD'}); let t='',cls='';
+    if(x.status==='locked')t='🔒 Coming soon';
+    else if(x.status==='paid'){ if(active(id)){t='✓ Paid'+(buys[id]?' · until '+new Date(buys[id]).toLocaleDateString():'');cls=' ok';a.style.borderColor='var(--ok)'} else if(id in buys)t='⏳ Expired · '+price; else t='🛒 '+price }
+    else if(x.status==='off')t='Hidden (admin view)';
+    if(t){const b=document.createElement('span');b.className='badge'+cls;b.textContent=t;a.appendChild(b)}
     if(x.status==='locked'&&!admin){a.style.opacity=.55;a.addEventListener('click',e=>e.preventDefault())}
   });
-  const gridEl=document.querySelector('#grid'),ord=a=>{const x=rows[decodeURIComponent(a.getAttribute('href')).split('/').pop().replace(/\.html?$/i,'').toLowerCase()];return x?x.sort_order:9999};
-[...gridEl.querySelectorAll('a.game')].sort((a,b)=>ord(a)-ord(b)).forEach(a=>gridEl.appendChild(a));
+  const gridEl=document.querySelector('#grid'),ord=a=>{const x=rows[idOf(a)];return x?x.sort_order:9999};
+  [...gridEl.querySelectorAll('a.game')].sort((a,b)=>ord(a)-ord(b)).forEach(a=>gridEl.appendChild(a));
   $("#count").textContent=document.querySelectorAll('a.game').length;
 }
-Arcade.onChange(applyStatus);
-listGames().then(files=>{
-  grid.innerHTML="";
-  if(!files||!files.length){
-    grid.innerHTML='<p class="msg">No games found.<br>Put <code>.html</code> files in <code>games/</code> and run <code>python scan.py</code>.</p>';
-    return;
-  }
-  $("#count").textContent=files.length;
-  for(const f of files){
-    const a=document.createElement("a");
-    a.className="game";a.href="games/"+encodeURIComponent(f);
-    const sw=document.createElement("span");sw.className="sw";
-    sw.style.background=`hsl(${hue(f)} 85% 62%)`;
-    const n=document.createElement("span");n.className="name";n.textContent=title(f);
-    a.append(sw,n);grid.appendChild(a);
-  }
-});
 
 function setTheme(t){document.documentElement.setAttribute("data-theme",t);
   $("#theme").textContent=t==="dark"?"Light mode":"Dark mode";try{localStorage.setItem("bs-theme",t)}catch(e){}}
