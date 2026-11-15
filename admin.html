@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Game Portal · Admin</title>
+<style>
+:root{--bg:#f4f5fa;--card:#fff;--ink:#1f2233;--mute:#6b6f86;--line:#e3e5ef;--acc:#5b6cf5;--ok:#13a36b;--warn:#f59e0b;--bad:#e5384f;--btn:#eef0f8;color-scheme:light}
+@media(prefers-color-scheme:dark){:root{--bg:#12131c;--card:#1c1d2b;--ink:#eceefa;--mute:#9a9db8;--line:#2e3048;--btn:#2a2c44;color-scheme:dark}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
+header{position:sticky;top:0;z-index:5;background:var(--card);border-bottom:1px solid var(--line);padding:10px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+header h1{margin:0;font-size:18px;margin-right:auto}.badge{font-size:12px;font-weight:800;padding:4px 10px;border-radius:99px;background:var(--btn)}.badge.god{background:var(--acc);color:#fff}
+main{max-width:1100px;margin:0 auto;padding:16px}
+.tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+button,select,input{font:inherit}button{cursor:pointer;border:1px solid var(--line);background:var(--btn);color:var(--ink);border-radius:10px;padding:8px 12px;font-weight:700}button:hover{border-color:var(--acc)}
+button.pri{background:var(--acc);border-color:var(--acc);color:#fff}button.dng{background:var(--bad);border-color:var(--bad);color:#fff}button:disabled{opacity:.5;cursor:not-allowed}
+.tab.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+input,select{padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.row{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}.card h3{margin:0;font-size:18px}.mute{color:var(--mute);font-size:13px}
+.seg{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:var(--btn);padding:4px;border-radius:12px}.seg button{border:0;background:transparent;padding:8px 2px;font-size:13px}.seg button.on{background:var(--card);box-shadow:0 1px 4px #0002}
+.seg button.on[data-s=on]{color:var(--ok)}.seg button.on[data-s=off]{color:var(--bad)}.seg button.on[data-s=locked]{color:var(--warn)}.seg button.on[data-s=paid]{color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center}.stats b{display:block;font-size:18px}.stats span{font-size:11px;color:var(--mute)}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:8px 6px;text-align:left;border-bottom:1px solid var(--line)}th{color:var(--mute);font-size:11px;text-transform:uppercase}.scroll{overflow-x:auto}
+.pill{font-size:11px;font-weight:800;padding:3px 8px;border-radius:99px;background:var(--btn)}.pill.bl{background:var(--bad);color:#fff}
+.center{text-align:center;padding:60px 16px}.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:700;z-index:50;max-width:90%}.toast.err{background:var(--bad);color:#fff}
+.ov{position:fixed;inset:0;background:#0009;display:grid;place-items:center;padding:16px;z-index:40}.modal{background:var(--card);border-radius:18px;padding:20px;width:min(420px,100%);display:flex;flex-direction:column;gap:12px}
+details{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:14px}summary{cursor:pointer;font-weight:800}.form{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}[hidden]{display:none!important}
+</style></head><body>
+<header><h1>🎛️ Game Portal Admin</h1><span class="badge" id="role"></span><span class="mute" id="who"></span><button id="out">Log out</button></header>
+<main id="main"><div class="center mute">Loading…</div></main>
+<script src="arcade.js" data-header="off"></script>
+<script>
+const A = window.Arcade, $ = s => document.querySelector(s);
+const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => '&#' + c.charCodeAt(0) + ';');
+const fmtD = d => d ? new Date(d).toLocaleDateString() : '–', fmtT = d => d ? new Date(d).toLocaleString() : '–';
+let roles = null, tab = 'games';
+const STATUS = { on: 'On', off: 'Off', locked: 'Locked', paid: 'Paid' };
+const HELP = { on: 'Playable by everyone', off: 'Hidden from the portal', locked: 'Visible, shows “coming soon”', paid: 'Needs a purchase to play' };
+
+function toast(m, err) { const t = document.createElement('div'); t.className = 'toast' + (err ? ' err' : ''); t.textContent = m; document.body.appendChild(t); setTimeout(() => t.remove(), 2800); }
+async function rpc(fn, args) { const { data, error } = await A.sb.rpc(fn, args || {}); if (error) { toast(error.message, true); throw error; } return data; }
+function confirmBox(title, text, needText) {
+  return new Promise(res => {
+    const o = document.createElement('div'); o.className = 'ov';
+    o.innerHTML = `<div class="modal"><b style="font-size:18px">${esc(title)}</b><div class="mute">${text}</div>${needText ? `<input id="cf" placeholder="Type: ${esc(needText)}">` : ''}<div class="row"><button id="no">Cancel</button><button class="dng" id="yes" ${needText ? 'disabled' : ''}>Confirm</button></div></div>`;
+    document.body.appendChild(o); const y = o.querySelector('#yes'), done = v => { o.remove(); res(v); };
+    if (needText) o.querySelector('#cf').oninput = e => { y.disabled = e.target.value.trim().toLowerCase() !== needText.toLowerCase(); };
+    o.querySelector('#no').onclick = () => done(false); y.onclick = () => done(true);
+  });
+}
+
+async function init() {
+  const m = $('#main'); $('#who').textContent = A.name() || '';
+  try { roles = await rpc('my_roles'); } catch (e) { m.innerHTML = '<div class="center">Could not check your access.</div>'; return; }
+  if (!roles.god && !(roles.games || []).length) { m.innerHTML = '<div class="center"><h2>No admin access</h2><p class="mute">This account is not an admin. Ask the portal owner to add you to a game.</p></div>'; $('#role').textContent = 'No access'; return; }
+  $('#role').textContent = roles.god ? 'God admin' : 'Game admin'; $('#role').className = 'badge' + (roles.god ? ' god' : '');
+  draw();
+}
+function draw() {
+  const tabs = [['games', '🎮 Games']].concat(roles.god ? [['users', '👥 Users'], ['admins', '🛡 Admins'], ['audit', '📜 Audit log']] : []);
+  $('#main').innerHTML = `<div class="tabs">${tabs.map(([k, t]) => `<button class="tab ${k === tab ? 'on' : ''}" data-t="${k}">${t}</button>`).join('')}</div><div id="pane"></div>`;
+  document.querySelectorAll('.tab').forEach(b => b.onclick = () => { tab = b.dataset.t; draw(); });
+  ({ games: gamesTab, users: usersTab, admins: adminsTab, audit: auditTab })[tab]();
+}
+
+/* ---------- games ---------- */
+async function gamesTab() {
+  const p = $('#pane'); p.innerHTML = '<div class="mute">Loading games…</div>';
+  const gs = await rpc('admin_games');
+  p.innerHTML = '<div class="grid" id="gg"></div>' + (roles.god ? `<details><summary>＋ Add a game</summary><div class="form"><input id="ng_id" placeholder="id (e.g. snake)"><input id="ng_t" placeholder="Title"><input id="ng_k" placeholder="score name (optional)"><button class="pri" id="ng_b">Add</button></div><div class="mute" style="margin-top:8px">The id is the file name without .html. The score name is the game name used when saving scores.</div></details>` : '');
+  gs.forEach(g => $('#gg').appendChild(gameCard(g)));
+  if (!gs.length) $('#gg').innerHTML = '<div class="mute">No games yet.</div>';
+  const nb = $('#ng_b'); if (nb) nb.onclick = async () => { const id = $('#ng_id').value.trim().toLowerCase(); if (!/^[a-z0-9-]{2,30}$/.test(id) || !$('#ng_t').value.trim()) return toast('Use an id like "my-game" and a title', true); await rpc('admin_upsert_game', { p_id: id, p_title: $('#ng_t').value.trim(), p_score_key: $('#ng_k').value.trim() }); toast('Game added'); gamesTab(); };
+}
+function gameCard(g) {
+  const c = document.createElement('div'); c.className = 'card';
+  const cur = g.currency || 'USD';
+  c.innerHTML = `<div class="row"><h3>${esc(g.title)}</h3><span class="mute">${esc(g.id)}</span></div>
+  <div class="seg">${Object.keys(STATUS).map(s => `<button data-s="${s}" class="${g.status === s ? 'on' : ''}">${STATUS[s]}</button>`).join('')}</div>
+  <div class="mute" data-h>${HELP[g.status]}</div>
+  <div class="row" data-price ${g.status === 'paid' ? '' : 'hidden'}><span class="mute">Price</span><span><select data-cur>${['USD', 'EUR', 'GBP', 'ILS'].map(x => `<option ${x === cur ? 'selected' : ''}>${x}</option>`).join('')}</select> <input data-amt type="number" min="0" step="0.01" style="width:90px" value="${(g.price_cents / 100).toFixed(2)}"> <button data-save>Save</button></span></div>
+  <div class="stats"><div><b>${g.players}</b><span>Players</span></div><div><b>${g.plays}</b><span>Plays</span></div><div><b>${g.plays7}</b><span>Last 7d</span></div><div><b>${g.owners}</b><span>Owners</span></div></div>
+  <button data-pl>👥 Players</button><div data-list hidden></div>`;
+  const save = async status => { const amt = Math.round(parseFloat(c.querySelector('[data-amt]').value || 0) * 100); await rpc('admin_set_game', { p_id: g.id, p_status: status, p_price: amt, p_currency: c.querySelector('[data-cur]').value }); g.status = status; toast(`${g.title}: ${STATUS[status]}`); };
+  c.querySelectorAll('.seg button').forEach(b => b.onclick = async () => { await save(b.dataset.s); c.querySelectorAll('.seg button').forEach(x => x.classList.toggle('on', x === b)); c.querySelector('[data-h]').textContent = HELP[b.dataset.s]; c.querySelector('[data-price]').hidden = b.dataset.s !== 'paid'; });
+  c.querySelector('[data-save]').onclick = () => save(g.status);
+  c.querySelector('[data-pl]').onclick = async () => { const l = c.querySelector('[data-list]'); if (!l.hidden) { l.hidden = true; return; } l.hidden = false; l.innerHTML = '<div class="mute">Loading…</div>'; const rows = await rpc('admin_game_players', { p_game: g.id });
+    l.innerHTML = rows.length ? `<div class="scroll"><table><tr><th>Player</th><th>Best</th><th>Plays</th><th>Last</th><th>Access</th></tr>${rows.map(r => `<tr><td>${esc(r.nickname || 'no nickname')}</td><td>${r.best}</td><td>${r.plays}</td><td>${fmtD(r.last_played)}</td><td><button data-u="${r.user_id}" data-o="${r.owns}">${r.owns ? 'Revoke' : 'Grant'}</button></td></tr>`).join('')}</table></div>` : '<div class="mute">No players yet.</div>';
+    l.querySelectorAll('[data-u]').forEach(b => b.onclick = async () => { const own = b.dataset.o === 'true'; await rpc(own ? 'admin_revoke' : 'admin_grant', { p_user: b.dataset.u, p_game: g.id }); b.dataset.o = String(!own); b.textContent = own ? 'Grant' : 'Revoke'; toast(own ? 'Access removed' : 'Access granted'); }); };
+  return c;
+}
+
+/* ---------- users (God admin) ---------- */
+async function usersTab() {
+  $('#pane').innerHTML = '<div class="form" style="margin:0 0 12px"><input id="q" placeholder="Search email or nickname" style="flex:1;min-width:200px"><button id="qb" class="pri">Search</button></div><div id="ul" class="card scroll">Loading…</div>';
+  const load = async () => {
+    const us = await rpc('admin_users', { p_search: $('#q').value.trim() });
+    $('#ul').innerHTML = us.length ? `<table><tr><th>Player</th><th>Email</th><th>Joined</th><th>Last login</th><th>Plays</th><th></th></tr>${us.map(u => `<tr><td>${esc(u.nickname || '–')} ${u.blocked ? '<span class="pill bl">blocked</span>' : ''}</td><td>${esc(u.email)}</td><td>${fmtD(u.created_at)}</td><td>${fmtD(u.last_sign_in_at)}</td><td>${u.plays}</td><td style="white-space:nowrap"><button data-b="${u.id}" data-v="${u.blocked}">${u.blocked ? 'Unblock' : 'Block'}</button> <button class="dng" data-d="${u.id}" data-n="${esc(u.nickname || u.email)}">Delete</button></td></tr>`).join('')}</table>` : '<div class="mute">No users found.</div>';
+    $('#ul').querySelectorAll('[data-b]').forEach(b => b.onclick = async () => { const bl = b.dataset.v !== 'true'; await rpc('admin_set_blocked', { p_user: b.dataset.b, p_blocked: bl }); toast(bl ? 'User blocked' : 'User unblocked'); load(); });
+    $('#ul').querySelectorAll('[data-d]').forEach(b => b.onclick = async () => { const n = b.dataset.n; if (await confirmBox('Delete this user?', `This permanently deletes <b>${esc(n)}</b> and <b>all</b> their scores, ratings, matches and votes. It cannot be undone.`, n)) { await rpc('admin_delete_user', { p_user: b.dataset.d }); toast('User deleted'); load(); } });
+  };
+  $('#qb').onclick = load; $('#q').onkeydown = e => { if (e.key === 'Enter') load(); }; load();
+}
+
+/* ---------- game admins (God admin) ---------- */
+async function adminsTab() {
+  const gs = await rpc('admin_games');
+  $('#pane').innerHTML = `<div class="card" style="max-width:520px"><b>Give or remove game-admin access</b><div class="mute">The person must have logged in to the portal once. A game admin can change that game's status and price, see its players, and grant or revoke access. They cannot see emails or delete users.</div>
+  <input id="ae" type="email" placeholder="their email"><select id="ag">${gs.map(g => `<option value="${esc(g.id)}">${esc(g.title)}</option>`).join('')}</select>
+  <div class="row"><button class="pri" id="aon">Make admin</button><button id="aoff">Remove admin</button></div></div>`;
+  const go = on => async () => { const e = $('#ae').value.trim(); if (!e) return toast('Enter an email', true); await rpc('admin_assign', { p_email: e, p_game: $('#ag').value, p_on: on }); toast(on ? 'Admin added' : 'Admin removed'); };
+  $('#aon').onclick = go(true); $('#aoff').onclick = go(false);
+}
+
+/* ---------- audit log (God admin) ---------- */
+async function auditTab() {
+  $('#pane').innerHTML = '<div class="card scroll">Loading…</div>'; const rows = await rpc('admin_audit', { p_limit: 100 });
+  $('#pane').firstChild.innerHTML = rows.length ? `<table><tr><th>When</th><th>Who</th><th>Action</th><th>Target</th><th>Details</th></tr>${rows.map(r => `<tr><td>${fmtT(r.created_at)}</td><td>${esc(r.actor || '–')}</td><td>${esc(r.action)}</td><td>${esc(r.target || '')}</td><td class="mute">${esc(r.details ? JSON.stringify(r.details) : '')}</td></tr>`).join('')}</table>` : '<div class="mute">Nothing logged yet.</div>';
+}
+
+$('#out').onclick = () => A.logout();
+A.ready.then(() => A.onChange(u => { if (u) init(); else { $('#main').innerHTML = '<div class="center mute">Please log in…</div>'; $('#role').textContent = ''; $('#who').textContent = ''; } }));
+</script></body></html>
