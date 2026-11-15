@@ -119,7 +119,7 @@
     if (!ui.pill) return;
     const here = location.pathname.replace(/index\.html$/, ''), home = new URL(CONFIG.portalUrl).pathname.replace(/index\.html$/, '');
     const portal = here === home ? '' : `<a href="${CONFIG.portalUrl}">${esc(CONFIG.text.portalLabel)}</a>`;
-    ui.pill.innerHTML = portal + (!ready ? '' : A.user ? `<span>👤 ${esc(A.name())}</span><button id="ar-out">Log out</button>` : '<button id="ar-open">🔒 Log in</button>');
+    ui.pill.innerHTML = portal + (!ready ? '' : A.user ? `<span>👤 ${esc(A.name())}</span>${paidTag()}<button id="ar-out">Log out</button>` : '<button id="ar-open">🔒 Log in</button>');
     const o = ui.pill.querySelector('#ar-out'), i = ui.pill.querySelector('#ar-open');
     if (o) o.onclick = A.logout; if (i) i.onclick = A.open;
   };
@@ -162,19 +162,20 @@
       const roles = r.data || {}, row = g.data;
       if (roles.blocked) return wall('<h2>Account suspended</h2><p>Please contact the admin.</p>');
       if (!row) return wall(null); // not managed in the admin page: always playable
-      const admin = roles.god || (roles.games || []).includes(GAME_ID); let own = false;
-      if (row.status === 'paid') { const p = await A.sb.from('purchases').select('game_id').eq('game_id', GAME_ID).maybeSingle(); own = !!p.data; }
-      const ok = admin || row.status === 'on' || (row.status === 'paid' && own); A.access = { game: row, ok, admin, own };
+      const admin = roles.god || (roles.games || []).includes(GAME_ID); let own = false, had = false, exp = null; // paid access can have an end date
+      if (row.status === 'paid') { const p = await A.sb.from('purchases').select('game_id,expires_at').eq('game_id', GAME_ID).maybeSingle(); if (p.data) { had = true; exp = p.data.expires_at; own = !exp || new Date(exp) > new Date(); } }
+      const ok = admin || row.status === 'on' || (row.status === 'paid' && own); A.access = { game: row, ok, admin, own, exp }; ui.pillDraw();
       if (ok) return wall(null);
       const t = esc(row.title || GAME_ID);
       if (row.status === 'off') return wall(`<h2>${t}</h2><p>This game is not available right now.</p>${back}`);
       if (row.status === 'locked') return wall(`<h2>🔒 ${t}</h2><p>Coming soon!</p>${back}`);
       const buy = row.pay_url ? row.pay_url + (row.pay_url.includes('?') ? '&' : '?') + 'client_reference_id=' + encodeURIComponent(A.user.id) + '&prefilled_email=' + encodeURIComponent(A.user.email || '') : '';
-      wall(`<h2>🛒 ${t}</h2><p>This is a paid game · <b>${esc(money(row.price_cents, row.currency))}</b></p>`
+      wall(`<h2>🛒 ${t}</h2><p>This is a paid game · <b>${esc(money(row.price_cents, row.currency))}</b></p>${had && !own ? `<p>Your access ended on <b>${esc(new Date(exp).toLocaleDateString())}</b>. Renew to keep playing.</p>` : ''}`
         + (buy ? `<a class="ar-btn ar-primary" style="display:block;text-decoration:none;box-sizing:border-box" href="${esc(buy)}" target="_blank" rel="noopener">Buy now</a>` : '<p>Payment is not set up yet. Please contact the admin.</p>')
         + `<button class="ar-btn ar-ghost" id="ar-recheck">I've paid · check again</button><p>After you pay, the admin unlocks the game. Come back and tap “check again”.</p>${back}`);
     } catch (e) { console.warn('Arcade access check failed', e); }
   }
+  function paidTag() { const x = A.access; return x && x.own && x.game && x.game.status === 'paid' ? `<span style="color:#34d399;font-weight:800">✓ Paid${x.exp ? ' · until ' + esc(new Date(x.exp).toLocaleDateString()) : ''}</span>` : ''; }
   const SKIP = ['', 'index', 'admin'];
 
   /* ============ 6. Old calls from earlier pages (kept so nothing breaks) ============ */
