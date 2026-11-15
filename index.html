@@ -62,7 +62,7 @@ async function listGames(){
 }
 async function applyStatus(){
   await Arcade.ready; if(!Arcade.user)return;
-  const sb=Arcade.sb,[g,p,r]=await Promise.all([sb.from('games').select('id,title,status,price_cents,currency'),sb.from('purchases').select('game_id'),sb.rpc('my_roles')]);
+  const sb=Arcade.sb,[g,p,r]=await Promise.all([sb.from('games').select('id,title,status,price_cents,currency,sort_order'),sb.from('purchases').select('game_id'),sb.rpc('my_roles')]);
   const own=new Set((p.data||[]).map(x=>x.game_id)),roles=r.data||{},rows=Object.fromEntries((g.data||[]).map(x=>[x.id,x]));
   document.querySelectorAll('a.game').forEach(a=>{
     const id=decodeURIComponent(a.getAttribute('href')).split('/').pop().replace(/\.html?$/i,'').toLowerCase(),x=rows[id]; if(!x)return;
@@ -73,6 +73,8 @@ async function applyStatus(){
     if(t){const b=document.createElement('span');b.className='badge';b.textContent=t;a.appendChild(b)}
     if(x.status==='locked'&&!admin){a.style.opacity=.55;a.addEventListener('click',e=>e.preventDefault())}
   });
+  const gridEl=document.querySelector('#grid'),ord=a=>{const x=rows[decodeURIComponent(a.getAttribute('href')).split('/').pop().replace(/\.html?$/i,'').toLowerCase()];return x?x.sort_order:9999};
+[...gridEl.querySelectorAll('a.game')].sort((a,b)=>ord(a)-ord(b)).forEach(a=>gridEl.appendChild(a));
   $("#count").textContent=document.querySelectorAll('a.game').length;
 }
 Arcade.onChange(applyStatus);
