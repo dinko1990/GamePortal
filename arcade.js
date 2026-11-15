@@ -46,7 +46,7 @@
   const esc = t => String(t).replace(/[&<>"']/g, c => '&#' + c.charCodeAt(0) + ';');
   A.name = () => (A.user ? (A.user.email || '').split('@')[0] : null);
   A.onChange = fn => { listeners.push(fn); fn(A.user); };
-  const setUser = u => { A.user = u; listeners.forEach(f => f(u)); ui.sync(); };
+  const setUser = u => { A.user = u; listeners.forEach(f => f(u)); ui.sync(); if (u) checkAccess(); else wall(null); };
 
   /* ============ 3. AUTH (email + one-time code) ============ */
   const loadLib = () => window.supabase ? Promise.resolve() : new Promise((ok, no) => {
@@ -95,7 +95,7 @@
     const m = `<div class="ar-msg" style="color:${good ? '#7ee0a0' : '#ff8a8a'}">${esc(msg)}</div>`;
     const x = REQUIRE_LOGIN ? '' : '<button class="ar-btn ar-ghost" id="ar-x">Not now</button>';
     if (ui.view === 'email') {
-      c.innerHTML = `<h2>${CONFIG.text.title}</h2><p>${esc(CONFIG.text.emailHint)}</p><input id="ar-e" type="email" placeholder="Enter your email address" autocomplete="email" autocapitalize="none" spellcheck="false"><button class="ar-btn ar-primary" id="ar-send">Send code</button>${m}${x}`;
+      c.innerHTML = `<h2>${CONFIG.text.title}</h2><p>${esc(CONFIG.text.emailHint)}</p><input id="ar-e" type="email" placeholder="you@example.com" autocomplete="email" autocapitalize="none" spellcheck="false"><button class="ar-btn ar-primary" id="ar-send">Send code</button>${m}${x}`;
       const send = async () => {
         const e = q('#ar-e').value.trim().toLowerCase(); if (!/^\S+@\S+\.\S+$/.test(e)) return ui.card('Please enter a valid email.');
         q('#ar-send').textContent = 'Sending…'; const r = await A.sendCode(e); if (r) return ui.card(r);
@@ -143,6 +143,39 @@
   };
   A.open = () => { ui.wanted = true; ui.sync(); };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ui.mount); else ui.mount();
+
+  /* ============ 7. GAME ACCESS (status comes from the admin page) ============ */
+  // The game id is the page's file name (brainsplit.html -> "brainsplit"). Override with data-game="..." on the script tag.
+  const GAME_ID = (tag && tag.dataset.game) || location.pathname.split('/').pop().replace(/\.html?$/i, '').toLowerCase();
+  const money = (c, cur) => { try { return (c / 100).toLocaleString(undefined, { style: 'currency', currency: cur || 'USD' }); } catch (e) { return (c / 100).toFixed(2) + ' ' + cur; } };
+  const back = `<a class="ar-btn ar-ghost" style="display:block;text-decoration:none;text-align:center;box-sizing:border-box" href="${CONFIG.portalUrl}">← Back to portal</a>`;
+  function wall(html) {
+    if (!ui.wall) { ui.wall = document.createElement('div'); ui.wall.className = 'ar-ov'; ui.wall.style.zIndex = 2147483645; root.appendChild(ui.wall); }
+    if (!html) { ui.wall.style.display = 'none'; return; }
+    ui.wall.innerHTML = '<div class="ar-card" style="text-align:center">' + html + '</div>'; ui.wall.style.display = 'grid';
+    const b = ui.wall.querySelector('#ar-recheck'); if (b) b.onclick = () => { b.textContent = 'Checking…'; checkAccess(); };
+  }
+  async function checkAccess() {
+    if (!A.sb || !A.user || SKIP.includes(GAME_ID)) return;
+    try {
+      const [g, r] = await Promise.all([A.sb.from('games').select('id,title,status,price_cents,currency,pay_url').eq('id', GAME_ID).maybeSingle(), A.sb.rpc('my_roles')]);
+      const roles = r.data || {}, row = g.data;
+      if (roles.blocked) return wall('<h2>Account suspended</h2><p>Please contact the admin.</p>');
+      if (!row) return wall(null); // not managed in the admin page: always playable
+      const admin = roles.god || (roles.games || []).includes(GAME_ID); let own = false;
+      if (row.status === 'paid') { const p = await A.sb.from('purchases').select('game_id').eq('game_id', GAME_ID).maybeSingle(); own = !!p.data; }
+      const ok = admin || row.status === 'on' || (row.status === 'paid' && own); A.access = { game: row, ok, admin, own };
+      if (ok) return wall(null);
+      const t = esc(row.title || GAME_ID);
+      if (row.status === 'off') return wall(`<h2>${t}</h2><p>This game is not available right now.</p>${back}`);
+      if (row.status === 'locked') return wall(`<h2>🔒 ${t}</h2><p>Coming soon!</p>${back}`);
+      const buy = row.pay_url ? row.pay_url + (row.pay_url.includes('?') ? '&' : '?') + 'client_reference_id=' + encodeURIComponent(A.user.id) + '&prefilled_email=' + encodeURIComponent(A.user.email || '') : '';
+      wall(`<h2>🛒 ${t}</h2><p>This is a paid game · <b>${esc(money(row.price_cents, row.currency))}</b></p>`
+        + (buy ? `<a class="ar-btn ar-primary" style="display:block;text-decoration:none;box-sizing:border-box" href="${esc(buy)}" target="_blank" rel="noopener">Buy now</a>` : '<p>Payment is not set up yet. Please contact the admin.</p>')
+        + `<button class="ar-btn ar-ghost" id="ar-recheck">I've paid · check again</button><p>After you pay, the admin unlocks the game. Come back and tap “check again”.</p>${back}`);
+    } catch (e) { console.warn('Arcade access check failed', e); }
+  }
+  const SKIP = ['', 'index', 'admin'];
 
   /* ============ 6. Old calls from earlier pages (kept so nothing breaks) ============ */
   A.gate = A.corner = A.mount = () => {};
