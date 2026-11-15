@@ -28,6 +28,7 @@ a.game:focus-visible,.themebtn:focus-visible{outline:3px solid var(--logic);outl
 code{background:var(--logic2);color:var(--logic);border-radius:6px;padding:1px 6px}
 .ver{position:fixed;left:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));font-size:12px;color:var(--mute);opacity:.7;pointer-events:none}
 .themebtn{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));cursor:pointer}
+.game .badge{font-size:12px;font-weight:800;color:var(--mute)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -59,6 +60,22 @@ async function listGames(){
   }catch(e){}
   return null;
 }
+async function applyStatus(){
+  await Arcade.ready; if(!Arcade.user)return;
+  const sb=Arcade.sb,[g,p,r]=await Promise.all([sb.from('games').select('id,title,status,price_cents,currency'),sb.from('purchases').select('game_id'),sb.rpc('my_roles')]);
+  const own=new Set((p.data||[]).map(x=>x.game_id)),roles=r.data||{},rows=Object.fromEntries((g.data||[]).map(x=>[x.id,x]));
+  document.querySelectorAll('a.game').forEach(a=>{
+    const id=decodeURIComponent(a.getAttribute('href')).split('/').pop().replace(/\.html?$/i,'').toLowerCase(),x=rows[id]; if(!x)return;
+    const admin=roles.god||(roles.games||[]).includes(id); a.querySelectorAll('.badge').forEach(b=>b.remove());
+    if(x.status==='off'&&!admin){a.remove();return}
+    if(x.title)a.querySelector('.name').textContent=x.title;
+    let t=''; if(x.status==='locked')t='🔒 Coming soon'; else if(x.status==='paid'&&!own.has(id))t='🛒 '+(x.price_cents/100).toLocaleString(undefined,{style:'currency',currency:x.currency||'USD'}); else if(x.status==='off')t='Hidden (admin view)';
+    if(t){const b=document.createElement('span');b.className='badge';b.textContent=t;a.appendChild(b)}
+    if(x.status==='locked'&&!admin){a.style.opacity=.55;a.addEventListener('click',e=>e.preventDefault())}
+  });
+  $("#count").textContent=document.querySelectorAll('a.game').length;
+}
+Arcade.onChange(applyStatus);
 listGames().then(files=>{
   grid.innerHTML="";
   if(!files||!files.length){
