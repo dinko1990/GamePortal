@@ -130,12 +130,18 @@ async function usersTab() {
 
 /* ---------- game admins (God admin) ---------- */
 async function adminsTab() {
-  const gs = await rpc('admin_games');
-  $('#pane').innerHTML = `<div class="card" style="max-width:520px"><b>Give or remove game-admin access</b><div class="mute">The person must have logged in to the portal once. A game admin can change that game's status and price, see its players, and grant or revoke access. They cannot see emails or delete users.</div>
+  const [gs, list] = await Promise.all([rpc('admin_games'), rpc('admin_list_admins')]), me = A.user.id;
+  const chip = (a, x) => `<span class="pill" style="display:inline-flex;gap:4px;align-items:center;margin:2px">${esc(x.title)} <button data-rm="${a.user_id}|${esc(x.id)}" title="Remove from this game" style="padding:0 6px;border-radius:99px">✕</button></span>`;
+  const row = a => `<tr><td>${esc(a.email)}${a.user_id === me ? ' <span class="pill">you</span>' : ''}</td><td>${a.is_god ? '<span class="badge god">God admin</span>' : '<span class="badge">Game admin</span>'}</td><td>${a.is_god ? '<span class="mute">All games</span>' : (a.games.length ? a.games.map(x => chip(a, x)).join('') : '<span class="mute">none</span>')}</td><td style="white-space:nowrap">${a.user_id === me ? '' : (a.is_god ? `<button data-ng="${a.user_id}">Remove God rights</button> ` : '') + `<button class="dng" data-ra="${a.user_id}" data-e="${esc(a.email)}">Remove all access</button>`}</td></tr>`;
+  $('#pane').innerHTML = `<div class="card scroll" style="margin-bottom:14px"><b>Current admins</b>${list.length ? `<table><tr><th>Person</th><th>Role</th><th>Games they manage</th><th></th></tr>${list.map(row).join('')}</table>` : '<div class="mute">No admins yet.</div>'}</div>
+  <div class="card" style="max-width:520px"><b>Give or remove game-admin access</b><div class="mute">The person must have logged in to the portal once. A game admin can change that game's status and price, see its players, and grant or revoke access. They can see the emails of their game's players, but they cannot delete users or manage other games.</div>
   <input id="ae" type="email" placeholder="their email"><select id="ag">${gs.map(g => `<option value="${esc(g.id)}">${esc(g.title)}</option>`).join('')}</select>
   <div class="row"><button class="pri" id="aon">Make admin</button><button id="aoff">Remove admin</button></div></div>`;
-  const go = on => async () => { const e = $('#ae').value.trim(); if (!e) return toast('Enter an email', true); await rpc('admin_assign', { p_email: e, p_game: $('#ag').value, p_on: on }); toast(on ? 'Admin added' : 'Admin removed'); };
+  const go = on => async () => { const e = $('#ae').value.trim(); if (!e) return toast('Enter an email', true); await rpc('admin_assign', { p_email: e, p_game: $('#ag').value, p_on: on }); toast(on ? 'Admin added' : 'Admin removed'); adminsTab(); };
   $('#aon').onclick = go(true); $('#aoff').onclick = go(false);
+  $('#pane').querySelectorAll('[data-rm]').forEach(b => b.onclick = async () => { const [u, g] = b.dataset.rm.split('|'); await rpc('admin_unassign_game', { p_user: u, p_game: g }); toast('Removed from game'); adminsTab(); });
+  $('#pane').querySelectorAll('[data-ng]').forEach(b => b.onclick = async () => { if (!await confirmBox('Remove God rights?', 'This person will no longer be able to manage every game, users or admins.')) return; await rpc('admin_set_god', { p_user: b.dataset.ng, p_god: false }); toast('God rights removed'); adminsTab(); });
+  $('#pane').querySelectorAll('[data-ra]').forEach(b => b.onclick = async () => { if (!await confirmBox('Remove all admin access?', `<b>${esc(b.dataset.e)}</b> will lose every admin permission. Their player account and scores stay.`)) return; await rpc('admin_remove_admin', { p_user: b.dataset.ra }); toast('Admin access removed'); adminsTab(); });
 }
 
 /* ---------- audit log (God admin) ---------- */
