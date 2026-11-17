@@ -24,7 +24,7 @@ a.game:hover{border-color:var(--ink)} a.game:active{transform:scale(.97)}
 a.game:focus-visible,.themebtn:focus-visible{outline:3px solid var(--logic);outline-offset:2px}
 .sw{width:44px;height:44px;border-radius:50%;border:3px solid var(--card);box-shadow:0 0 0 1px var(--line)}
 .name{font-weight:800;font-size:20px;letter-spacing:-.01em;line-height:1.1;overflow-wrap:anywhere}
-.game .badge{font-size:12px;font-weight:800;color:var(--mute)} .game .badge.ok{color:var(--ok)}
+.game .badge{font-size:12px;font-weight:800;color:var(--mute)} a.game{position:relative} .game .net{position:absolute;top:12px;right:14px;font-size:16px} .game .badge.ok{color:var(--ok)}
 .msg{grid-column:1/-1;text-align:center;color:var(--mute);line-height:1.6}
 code{background:var(--logic2);color:var(--logic);border-radius:6px;padding:1px 6px}
 .ver{position:fixed;left:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));font-size:12px;color:var(--mute);opacity:.7;pointer-events:none}
@@ -35,7 +35,7 @@ code{background:var(--logic2);color:var(--logic);border-radius:6px;padding:1px 6
 <body>
 <script src="arcade.js"></script>
 <button class="pill themebtn" id="theme" type="button"></button>
-<div class="ver">v2.3</div>
+<div class="ver">v2.4</div>
 <main>
   <div class="hero">
     <h1><span>Game</span><br><span>Portal</span></h1>
@@ -64,7 +64,7 @@ async function listGames(){
 /* Game status from the admin page: hides Off games, marks Locked / Paid, orders the cards */
 async function applyStatus(){
   await Arcade.ready; if(!Arcade.user)return;
-  const sb=Arcade.sb,[g,p,r]=await Promise.all([sb.from('games').select('id,title,status,price_cents,currency,sort_order'),sb.from('purchases').select('game_id,expires_at'),sb.rpc('my_roles')]);
+  const sb=Arcade.sb,[g,p,r]=await Promise.all([sb.from('games').select('id,title,status,price_cents,currency,sort_order,offline'),sb.from('purchases').select('game_id,expires_at'),sb.rpc('my_roles')]);
   const buys=Object.fromEntries((p.data||[]).map(x=>[x.game_id,x.expires_at])),active=id=>id in buys&&(!buys[id]||new Date(buys[id])>new Date());
   const roles=r.data||{},rows=Object.fromEntries((g.data||[]).map(x=>[x.id,x])),idOf=a=>decodeURIComponent(a.getAttribute('href')).split('/').pop().replace(/\.html?$/i,'').toLowerCase();
   document.querySelectorAll('a.game').forEach(a=>{
@@ -77,6 +77,7 @@ async function applyStatus(){
     else if(x.status==='paid'){ if(active(id)){t='✓ Paid'+(buys[id]?' · until '+new Date(buys[id]).toLocaleDateString():'');cls=' ok';a.style.borderColor='var(--ok)'} else if(id in buys)t='⏳ Expired · '+price; else t='🛒 '+price }
     else if(x.status==='off')t='Hidden (admin view)';
     if(t){const b=document.createElement('span');b.className='badge'+cls;b.textContent=t;a.appendChild(b)}
+    a.querySelectorAll('.net').forEach(n=>n.remove());const off=x.offline||'online',ic=document.createElement('span');ic.className='net';ic.textContent=off==='online'?'📶':'✈️';ic.title=off==='full'?'Works offline':off==='partial'?'Some modes work offline':'Needs internet';a.appendChild(ic);
     if(x.status==='locked'&&!admin){a.style.opacity=.55;a.addEventListener('click',e=>e.preventDefault())}
   });
   const gridEl=document.querySelector('#grid'),ord=a=>{const x=rows[idOf(a)];return x?x.sort_order:9999};
