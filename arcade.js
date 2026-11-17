@@ -7,6 +7,7 @@
        <script src="arcade.js"></script>             (portal)
 
    Optional attributes on that tag:
+       data-offline                 -> register the offline cache (arcade-sw.js) so the game works without internet
        data-require-login="false"   -> no login wall (header + save still work)
        data-header="off"            -> no login header
    Optional: put <span id="arcade-header"></span> where the header should sit;
@@ -46,7 +47,7 @@
   const esc = t => String(t).replace(/[&<>"']/g, c => '&#' + c.charCodeAt(0) + ';');
   A.name = () => (A.user ? (A.user.email || '').split('@')[0] : null);
   A.onChange = fn => { listeners.push(fn); fn(A.user); };
-  const setUser = u => { A.user = u; listeners.forEach(f => f(u)); ui.sync(); if (u) checkAccess(); else wall(null); };
+  const setUser = u => { A.user = u; listeners.forEach(f => f(u)); ui.sync(); if (u) { checkAccess(); setTimeout(() => A.flush && A.flush(), 0); } else wall(null); };
 
   /* ============ 3. AUTH (email + one-time code) ============ */
   const loadLib = () => window.supabase ? Promise.resolve() : new Promise((ok, no) => {
@@ -67,11 +68,30 @@
   A.logout = async () => { await A.ready; return A.sb && A.sb.auth.signOut(); };
 
   /* ============ 4. SCORES ============ */
+  // Scores made while offline are kept on the device and sent later (when the same player is logged in again).
+  const QKEY = 'arcade:queue:v1';
+  const qRead = () => { try { return JSON.parse(localStorage.getItem(QKEY)) || []; } catch (e) { return []; } };
+  const qWrite = a => { try { localStorage.setItem(QKEY, JSON.stringify(a.slice(-200))); } catch (e) {} };
+  const cachedUid = () => { try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (/^sb-.*-auth-token$/.test(k)) { const j = JSON.parse(localStorage.getItem(k)); const u = j && (j.user || (j.currentSession && j.currentSession.user)); if (u) return u.id; } } } catch (e) {} return null; };
+  const isNet = e => /fetch|network|load failed/i.test((e && e.message) || '');
   A.save = async (game, data) => {
-    await A.ready; if (!A.sb || !A.user || !data || !data.score) return false;
+    if (!data || !data.score) return false;
+    await A.ready;
+    if (!A.sb || !A.user || !navigator.onLine) { const uid = (A.user && A.user.id) || cachedUid(); if (uid) { const q = qRead(); q.push({ uid, game, data, t: Date.now() }); qWrite(q); } return false; }
     const { error } = await A.sb.from('scores').insert(Object.assign({ game }, data));
-    if (error) console.warn('Arcade save failed', error); return !error;
+    if (error) { console.warn('Arcade save failed', error); if (isNet(error)) { const q = qRead(); q.push({ uid: A.user.id, game, data, t: Date.now() }); qWrite(q); } return false; }
+    return true;
   };
+  A.flush = async () => {
+    if (!A.sb || !A.user || !navigator.onLine) return; const keep = [];
+    for (const e of qRead()) {
+      if (e.uid !== A.user.id) { keep.push(e); continue; }
+      const { error } = await A.sb.from('scores').insert(Object.assign({ game: e.game }, e.data, { created_at: new Date(e.t).toISOString() }));
+      if (error && isNet(error)) keep.push(e);
+    }
+    qWrite(keep);
+  };
+  addEventListener('online', () => A.flush());
   A.myScores = async game => {
     await A.ready; if (!A.sb || !A.user) return [];
     const { data } = await A.sb.from('scores').select('*').eq('game', game).order('created_at', { ascending: false }).limit(2000);
@@ -180,6 +200,11 @@
 
   /* ============ 6. Old calls from earlier pages (kept so nothing breaks) ============ */
   A.gate = A.corner = A.mount = () => {};
+
+  // data-offline on the script tag: caches this game and the portal so they open without internet
+  if (tag && tag.dataset.offline !== undefined && tag.src && 'serviceWorker' in navigator && location.protocol.startsWith('http')) {
+    addEventListener('load', () => navigator.serviceWorker.register(new URL('arcade-sw.js', tag.src).href).catch(() => {}));
+  }
 
   window.Arcade = A;
 })();
