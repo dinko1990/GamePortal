@@ -95,6 +95,7 @@ function gameCard(g) {
   c.innerHTML = `<div class="row"><h3>${roles.god ? '<span class="drag" title="Drag to reorder">⠿</span>' : ''}${esc(g.title)}</h3><span class="mute">${esc(g.id)}</span></div>
   <div class="seg">${Object.keys(STATUS).map(s => `<button data-s="${s}" class="${g.status === s ? 'on' : ''}">${STATUS[s]}</button>`).join('')}</div>
   <div class="mute" data-h>${HELP[g.status]}</div>
+  <div class="row"><span class="mute">Works offline?</span><select data-off><option value="online">📶 Needs internet</option><option value="partial">✈️ Some modes</option><option value="full">✈️ Fully offline</option></select></div>
   <div data-price ${g.status === 'paid' ? '' : 'hidden'} style="display:flex;flex-direction:column;gap:8px">
     <div class="row"><span class="mute">Price</span><span><select data-cur>${['USD', 'EUR', 'GBP', 'ILS'].map(x => `<option ${x === cur ? 'selected' : ''}>${x}</option>`).join('')}</select> <input data-amt type="number" min="0" step="0.01" style="width:90px" value="${(g.price_cents / 100).toFixed(2)}"></span></div>
     <input data-url placeholder="Payment link (https://buy.stripe.com/…)" value="${esc(g.pay_url || '')}"><button data-save>Save price &amp; link</button>
@@ -103,6 +104,8 @@ function gameCard(g) {
   <button data-pl>👥 Players</button><div data-list hidden></div>`;
   const save = async status => { const amt = Math.round(parseFloat(c.querySelector('[data-amt]').value || 0) * 100); await rpc('admin_set_game', { p_id: g.id, p_status: status, p_price: amt, p_currency: c.querySelector('[data-cur]').value, p_pay_url: c.querySelector('[data-url]').value.trim() }); g.status = status; toast(`${g.title}: ${STATUS[status]}`); };
   c.querySelectorAll('.seg button').forEach(b => b.onclick = async () => { await save(b.dataset.s); c.querySelectorAll('.seg button').forEach(x => x.classList.toggle('on', x === b)); c.querySelector('[data-h]').textContent = HELP[b.dataset.s]; c.querySelector('[data-price]').hidden = b.dataset.s !== 'paid'; });
+  c.querySelector('[data-off]').value = g.offline || 'online';
+  c.querySelector('[data-off]').onchange = async e => { await rpc('admin_set_offline', { p_id: g.id, p_offline: e.target.value }); toast('Offline setting saved'); };
   c.querySelector('[data-save]').onclick = () => save(g.status);
   c.querySelector('[data-gb]').onclick = async () => { const w = c.querySelector('[data-who]').value.trim(); if (!w) return toast('Enter a nickname, email or user id', true); const r = await rpc('admin_grant_by', { p_who: w, p_game: g.id, p_days: +c.querySelector('[data-gdur]').value || null }); if (r) toast(r, true); else { toast('Access granted'); c.querySelector('[data-who]').value = ''; } };
   c.querySelector('[data-pl]').onclick = async () => { const l = c.querySelector('[data-list]'); if (!l.hidden) { l.hidden = true; return; } l.hidden = false; l.innerHTML = '<div class="mute">Loading…</div>'; const rows = await rpc('admin_game_players', { p_game: g.id });
