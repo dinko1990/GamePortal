@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Say It Backward</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔁</text></svg>">
+<script>try{var t=localStorage.getItem('bs-theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<style>
+:root{--bg:#fbf7ee;--card:#fffdf8;--ink:#2a2620;--mute:#7a7364;--line:#ece4d2;--logic:#3b5bff;--ok:#13a36b;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12111d;--card:#1c1b2c;--ink:#f1f0fa;--mute:#9a98b5;--line:#2e2c46;--logic:#7b93ff;--ok:#32d296;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#12111d;--card:#1c1b2c;--ink:#f1f0fa;--mute:#9a98b5;--line:#2e2c46;--logic:#7b93ff;--ok:#32d296;color-scheme:dark}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;min-height:100dvh;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;display:flex;justify-content:center}
+main{width:min(100%,520px);padding:calc(14px + env(safe-area-inset-top,0px)) 14px calc(28px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:12px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+button{font:inherit;cursor:pointer;border:0;color:inherit}button:focus-visible{outline:3px solid var(--logic);outline-offset:3px}
+.pill{background:var(--card);border:1px solid var(--line);border-radius:99px;padding:7px 13px;font-weight:700;font-size:13px;color:var(--ink)}
+h1{margin:4px 0 0;font-size:clamp(30px,9vw,42px);letter-spacing:-.04em;text-align:center}h1 span{color:var(--logic)}
+.sub{text-align:center;color:var(--mute);font-size:13px;margin:-6px 0 0}
+.cats{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}.cats .pill{cursor:pointer}.cats .on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.name{background:#fff;color:#16151f;border:2px solid #e6e1d4;border-radius:26px;padding:22px 16px;min-height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;box-shadow:0 6px 0 #e6e1d4;width:100%}
+.name:active{transform:translateY(3px);box-shadow:0 3px 0 #e6e1d4}
+.name b{font-size:clamp(26px,8.4vw,42px);line-height:1.05;letter-spacing:-.03em;text-align:center}.name small{color:#7a7364;font-size:13px;font-weight:700}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.sq{position:relative;aspect-ratio:1;border-radius:26px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:10px;font-weight:800;font-size:clamp(14px,4.2vw,18px);text-align:center;line-height:1.15;transition:opacity .2s,transform .1s}
+.sq .ic{font-size:clamp(38px,12vw,56px);line-height:1}.sq .n{position:absolute;top:10px;left:12px;width:26px;height:26px;border-radius:50%;background:#0002;display:grid;place-items:center;font-size:13px}
+.sq:active:not(:disabled){transform:scale(.97)}.sq:disabled{opacity:.3;cursor:not-allowed}
+.yellow{background:#ffd23f;color:#2a2620;box-shadow:0 6px 0 #d9a900}.blue{background:#3b82f6;color:#fff;box-shadow:0 6px 0 #1f56b8}
+.sq.rec{background:#ef4444;color:#fff;box-shadow:0 6px 0 #a61d1d;animation:pulse 1s infinite}
+.sq.next:not(:disabled):not(.rec){outline:4px solid var(--logic);outline-offset:3px}.sq.done::after{content:'✓';position:absolute;top:8px;right:12px;font-size:20px}
+@keyframes pulse{50%{transform:scale(1.03)}}
+.hint{text-align:center;font-weight:700;min-height:2.6em;line-height:1.3}.err{color:#ef4444}
+.row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}.row .pill{cursor:pointer}.row .pill:disabled{opacity:.4;cursor:not-allowed}
+.foot{text-align:center;color:var(--mute);font-size:12px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body><main>
+<div class="top"><span id="arcade-header"></span><button class="pill" id="theme" type="button" aria-label="Toggle dark mode">🌙</button></div>
+<h1>Say it <span>backward</span></h1>
+<p class="sub">Say the name, hear it reversed, copy the reversed sound, then flip it back.</p>
+<div class="cats" id="cats"></div>
+<button class="name" id="name" type="button"><small id="cat"></small><b id="nm">…</b><small>tap for another name</small></button>
+<div class="grid">
+ <button class="sq yellow" id="b2" type="button"><span class="n">2</span><span class="ic">🎙️</span><span id="t2">Record the name</span></button>
+ <button class="sq blue" id="b3" type="button" disabled><span class="n">3</span><span class="ic">⏪</span><span>Play it reversed</span></button>
+ <button class="sq yellow" id="b4" type="button" disabled><span class="n">4</span><span class="ic">🎙️</span><span id="t4">Record the reversed sound</span></button>
+ <button class="sq blue" id="b5" type="button" disabled><span class="n">5</span><span class="ic">⏪</span><span>Play your reverse</span></button>
+</div>
+<div class="hint" id="hint"></div>
+<div class="row"><button class="pill" id="orig" type="button" disabled>▶ Hear the original</button><button class="pill" id="share" type="button" disabled>📤 Share my backward</button></div>
+<div class="foot" id="foot"></div>
+</main>
+<script src="../arcade.js"></script>
+<script>
+const NAMES={leaders:"Nelson Mandela|Abraham Lincoln|Mahatma Gandhi|Winston Churchill|Cleopatra|Napoleon Bonaparte|Queen Victoria|Julius Caesar|Alexander the Great|Martin Luther King|Franklin Roosevelt|John Kennedy|George Washington|Thomas Jefferson|Theodore Roosevelt|Ronald Reagan|Barack Obama|Margaret Thatcher|Golda Meir|David Ben-Gurion|Yitzhak Rabin|Shimon Peres|Menachem Begin|Theodor Herzl|Chaim Weizmann|Moshe Dayan|Queen Elizabeth|Joan of Arc|Charles de Gaulle|Angela Merkel|Mikhail Gorbachev|Simon Bolivar|Mustafa Ataturk|Saladin|Suleiman the Magnificent|Peter the Great|Catherine the Great|Ramses the Second|Tutankhamun|Hammurabi|Marcus Aurelius|Augustus Caesar|Charlemagne|Richard the Lionheart|Henry the Eighth|Elizabeth the First|Louis the Fourteenth|Montezuma|Sitting Bull|Haile Selassie|Kwame Nkrumah|Jomo Kenyatta|Indira Gandhi|Jawaharlal Nehru|Sun Yat-sen|Ho Chi Minh|Lech Walesa|Vaclav Havel|Willy Brandt|Konrad Adenauer|Helmut Kohl|Francois Mitterrand|Pierre Trudeau|Jacinda Ardern|Benazir Bhutto|Eleanor Roosevelt|Rosa Parks|Malcolm X|Harriet Tubman|Frederick Douglass|Susan Anthony|Emmeline Pankhurst|Mother Teresa|Pope Francis|Dalai Lama|Anwar Sadat|Dwight Eisenhower|Harry Truman|Jimmy Carter|Bill Clinton|Tony Blair|Clement Attlee|Benjamin Disraeli|William Gladstone|Giuseppe Garibaldi|Otto von Bismarck|Frederick the Great|Maria Theresa|Isabella of Castile|Christopher Columbus|Genghis Khan|Kublai Khan|Ashoka the Great|Akbar the Great|Qin Shi Huang|Hannibal|Spartacus|Pericles|Leonidas|Boudicca|Robert the Bruce|William Wallace",scientists:"Albert Einstein|Isaac Newton|Marie Curie|Charles Darwin|Nikola Tesla|Galileo Galilei|Stephen Hawking|Alan Turing|Louis Pasteur|Michael Faraday|Ada Lovelace|Thomas Edison|Alexander Fleming|Gregor Mendel|Johannes Kepler|Nicolaus Copernicus|Archimedes|Aristotle|Pythagoras|Euclid|Leonardo da Vinci|Max Planck|Niels Bohr|Werner Heisenberg|Erwin Schrodinger|Richard Feynman|Carl Sagan|Neil deGrasse Tyson|Jane Goodall|Rosalind Franklin|James Watson|Francis Crick|Dmitri Mendeleev|Antoine Lavoisier|Robert Boyle|Robert Hooke|Edwin Hubble|Enrico Fermi|Robert Oppenheimer|Ernest Rutherford|James Maxwell|Heinrich Hertz|Alessandro Volta|Andre Ampere|Georg Ohm|Benjamin Franklin|Samuel Morse|Alexander Graham Bell|Guglielmo Marconi|Orville Wright|Wilbur Wright|Carl Gauss|Leonhard Euler|Blaise Pascal|Rene Descartes|Pierre Fermat|Srinivasa Ramanujan|Emmy Noether|Katherine Johnson|Mae Jemison|Neil Armstrong|Buzz Aldrin|Yuri Gagarin|Valentina Tereshkova|Sally Ride|Edward Jenner|Joseph Lister|Florence Nightingale|Robert Koch|Sigmund Freud|Carl Jung|Ivan Pavlov|Jean Piaget|Hippocrates|Avicenna|Omar Khayyam|Maimonides|Ilan Ramon|Ada Yonath|Daniel Kahneman|Dan Shechtman|Linus Pauling|Barbara McClintock|Rachel Carson|Lise Meitner|Jonas Salk|Albert Sabin|Alfred Nobel|Wernher von Braun|Tim Berners-Lee|Grace Hopper|Alan Kay|Hedy Lamarr|Mary Anning|Carolus Linnaeus|Thomas Huxley|Konrad Lorenz|Jacques Cousteau|David Attenborough",actors:"Charlie Chaplin|Marilyn Monroe|Audrey Hepburn|Tom Hanks|Meryl Streep|Robin Williams|Jackie Chan|Bruce Lee|Will Smith|Emma Watson|Leonardo DiCaprio|Brad Pitt|Angelina Jolie|Johnny Depp|Morgan Freeman|Denzel Washington|Robert De Niro|Al Pacino|Jack Nicholson|Harrison Ford|Samuel L. Jackson|Dwayne Johnson|Arnold Schwarzenegger|Sylvester Stallone|Keanu Reeves|Tom Cruise|Julia Roberts|Sandra Bullock|Nicole Kidman|Cate Blanchett|Scarlett Johansson|Jennifer Lawrence|Emma Stone|Natalie Portman|Anne Hathaway|Kate Winslet|Judi Dench|Maggie Smith|Helen Mirren|Daniel Radcliffe|Rupert Grint|Hugh Jackman|Ryan Reynolds|Chris Hemsworth|Chris Evans|Robert Downey|Mark Ruffalo|Tom Holland|Zendaya|Timothee Chalamet|Ryan Gosling|Matt Damon|Ben Affleck|George Clooney|Jim Carrey|Eddie Murphy|Adam Sandler|Mel Brooks|Buster Keaton|Humphrey Bogart|Cary Grant|James Dean|Marlon Brando|Elizabeth Taylor|Grace Kelly|Ingrid Bergman|Katharine Hepburn|Sophia Loren|Brigitte Bardot|Clint Eastwood|John Wayne|Sean Connery|Roger Moore|Daniel Craig|Pierce Brosnan|Anthony Hopkins|Ian McKellen|Patrick Stewart|Benedict Cumberbatch|Tom Hardy|Christian Bale|Heath Ledger|Joaquin Phoenix|Gal Gadot|Sacha Baron Cohen|Mila Kunis|Jason Statham|Vin Diesel|Jet Li|Amitabh Bachchan|Shah Rukh Khan|Priyanka Chopra|Penelope Cruz|Javier Bardem|Antonio Banderas|Salma Hayek|Idris Elba|Chadwick Boseman|Viola Davis|Whoopi Goldberg|Mr Bean|Louis de Funes|Jean Reno|Marion Cotillard|Gerard Depardieu",sport:"Lionel Messi|Cristiano Ronaldo|Pele|Diego Maradona|Michael Jordan|LeBron James|Kobe Bryant|Serena Williams|Venus Williams|Usain Bolt|Muhammad Ali|Roger Federer|Rafael Nadal|Novak Djokovic|Michael Phelps|Tom Brady|Neymar|Zinedine Zidane|David Beckham|Kylian Mbappe|Erling Haaland|Johan Cruyff|Franz Beckenbauer|Ronaldinho|Thierry Henry|Zlatan Ibrahimovic|Luka Modric|Mohamed Salah|Sadio Mane|Robert Lewandowski|Kevin De Bruyne|Harry Kane|Wayne Rooney|Paolo Maldini|Andrea Pirlo|Gianluigi Buffon|Manuel Neuer|Iker Casillas|Xavi Hernandez|Andres Iniesta|Eden Hazard|Luis Suarez|Gareth Bale|Steph Curry|Kevin Durant|Shaquille O'Neal|Magic Johnson|Larry Bird|Kareem Abdul-Jabbar|Giannis Antetokounmpo|Luka Doncic|Dirk Nowitzki|Tim Duncan|Dennis Rodman|Wilt Chamberlain|Babe Ruth|Jackie Robinson|Derek Jeter|Wayne Gretzky|Sidney Crosby|Alex Ovechkin|Tiger Woods|Rory McIlroy|Jack Nicklaus|Arnold Palmer|Lewis Hamilton|Michael Schumacher|Ayrton Senna|Max Verstappen|Sebastian Vettel|Fernando Alonso|Valentino Rossi|Simone Biles|Nadia Comaneci|Carl Lewis|Jesse Owens|Eliud Kipchoge|Mo Farah|Haile Gebrselassie|Allyson Felix|Katie Ledecky|Ian Thorpe|Mark Spitz|Lindsey Vonn|Shaun White|Tony Hawk|Mike Tyson|Floyd Mayweather|Manny Pacquiao|George Foreman|Joe Frazier|Sugar Ray Leonard|Conor McGregor|Maria Sharapova|Steffi Graf|Martina Navratilova|Billie Jean King|Naomi Osaka|Andy Murray|Pete Sampras|Andre Agassi|Bjorn Borg|Yao Ming|Shohei Ohtani|Patrick Mahomes|Peyton Manning|Gal Fridman|Yarden Gerbi|Linoy Ashram|Deni Avdija|Yossi Benayoun|Eran Zahavi"};
+const CATS=[['all','🎲 All'],['leaders','👑 Leaders'],['scientists','🔬 Scientists'],['actors','🎬 Actors'],['sport','⚽ Sport']],LABEL={leaders:'Leader',scientists:'Scientist',actors:'Actor',sport:'Sport star'};
+const $=s=>document.querySelector(s),pool=k=>(k==='all'?Object.keys(NAMES):[k]).flatMap(c=>NAMES[c].split('|').map(n=>({n,c})));
+let cat='all',cur=null,orig=null,imit=null,heard=false,rounds=0,ctx=null,src=null,recording=null,seen=new Set();
+const audio=()=>(ctx||(ctx=new (window.AudioContext||window.webkitAudioContext)()),ctx.state==='suspended'&&ctx.resume(),ctx);
+
+/* ---------- audio helpers ---------- */
+function reversed(buf){const c=audio(),out=c.createBuffer(buf.numberOfChannels,buf.length,buf.sampleRate);for(let ch=0;ch<buf.numberOfChannels;ch++)out.copyToChannel(Float32Array.from(buf.getChannelData(ch)).reverse(),ch);return out}
+function trim(buf){ // cut silence at both ends so the reversed sound starts right away
+ const c=audio(),d=buf.getChannelData(0);let peak=0;for(let i=0;i<d.length;i++)peak=Math.max(peak,Math.abs(d[i]));
+ const th=Math.max(.01,peak*.12);let a=0,b=d.length-1;while(a<b&&Math.abs(d[a])<th)a++;while(b>a&&Math.abs(d[b])<th)b--;
+ const pad=Math.floor(buf.sampleRate*.06);a=Math.max(0,a-pad);b=Math.min(d.length-1,b+pad);
+ const out=c.createBuffer(buf.numberOfChannels,b-a+1,buf.sampleRate);for(let ch=0;ch<buf.numberOfChannels;ch++)out.copyToChannel(buf.getChannelData(ch).slice(a,b+1),ch);return out}
+function play(buf,done){stop();const c=audio();src=c.createBufferSource();src.buffer=buf;src.connect(c.destination);src.onended=()=>{src=null;done&&done()};src.start()}
+function stop(){if(src){try{src.onended=null;src.stop()}catch(e){}src=null}}
+function wav(buf){const n=buf.length,ch=buf.numberOfChannels,sr=buf.sampleRate,v=new DataView(new ArrayBuffer(44+n*ch*2)),w=(o,s)=>[...s].forEach((x,i)=>v.setUint8(o+i,x.charCodeAt(0)));
+ w(0,'RIFF');v.setUint32(4,36+n*ch*2,true);w(8,'WAVEfmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,ch,true);v.setUint32(24,sr,true);v.setUint32(28,sr*ch*2,true);v.setUint16(32,ch*2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,n*ch*2,true);
+ let o=44;for(let i=0;i<n;i++)for(let c=0;c<ch;c++){const s=Math.max(-1,Math.min(1,buf.getChannelData(c)[i]));v.setInt16(o,s<0?s*32768:s*32767,true);o+=2}return new Blob([v],{type:'audio/wav'})}
+
+/* ---------- recording ---------- */
+async function record(kind){
+ if(recording){recording.stop();return}
+ stop();audio();$('#hint').classList.remove('err');
+ let stream;try{stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:true}})}
+ catch(e){return say('Microphone blocked. Allow the microphone for this site and try again.',true)}
+ const mr=new MediaRecorder(stream),chunks=[],btn=$(kind==='orig'?'#b2':'#b4'),lbl=$(kind==='orig'?'#t2':'#t4'),t0=Date.now();
+ const text=lbl.textContent;let tick=setInterval(()=>{lbl.textContent='● '+((Date.now()-t0)/1000).toFixed(1)+'s · tap to stop'},100),auto=setTimeout(()=>mr.stop(),6000);
+ btn.classList.add('rec');recording=mr;refresh();
+ mr.ondataavailable=e=>chunks.push(e.data);
+ mr.onstop=async()=>{clearInterval(tick);clearTimeout(auto);recording=null;btn.classList.remove('rec');lbl.textContent=text;stream.getTracks().forEach(t=>t.stop());
+  try{const b=trim(await audio().decodeAudioData(await new Blob(chunks,{type:mr.mimeType}).arrayBuffer()));
+   if(b.duration<.25)return say('That was too short. Try again and say the whole name.',true);
+   if(kind==='orig'){orig=b;imit=null;heard=false}else imit=b;
+  }catch(e){say('Could not read the recording. Try again.',true)}refresh()};
+ mr.start();
+}
+
+/* ---------- flow ---------- */
+function say(t,err){const h=$('#hint');h.textContent=t;h.classList.toggle('err',!!err)}
+function refresh(){
+ const r=!!recording;
+ $('#b2').disabled=r&&recording&&$('#b2').classList.contains('rec')===false;$('#b4').disabled=!orig||!heard||(r&&!$('#b4').classList.contains('rec'));$('#b3').disabled=!orig||r;$('#b5').disabled=!imit||r;
+ $('#orig').disabled=!orig||r;$('#share').disabled=!imit||r;
+ $('#b2').classList.toggle('done',!!orig);$('#b3').classList.toggle('done',heard);$('#b4').classList.toggle('done',!!imit);
+ ['b2','b3','b4','b5'].forEach(i=>$('#'+i).classList.remove('next'));
+ const step=!orig?'b2':!heard?'b3':!imit?'b4':'b5';if(!r)$('#'+step).classList.add('next');
+ if(!r&&!$('#hint').classList.contains('err'))say(!orig?'Step 1: say the name out loud. Tap yellow and speak.':!heard?'Now hear how your recording sounds when it is played backward.':!imit?'Step 4: copy that backward sound as closely as you can. Tap yellow and try!':'Play your reverse. It should sound like the real name!');
+ $('#foot').textContent=rounds?`Names completed: ${rounds}`:'';
+}
+function nextName(){stop();if(recording)recording.stop();const p=pool(cat);let t;for(let i=0;i<50;i++){t=p[Math.random()*p.length|0];if(!seen.has(t.n))break}seen.add(t.n);if(seen.size>=p.length)seen.clear();
+ cur=t;orig=imit=null;heard=false;$('#nm').textContent=t.n;$('#cat').textContent=LABEL[t.c];$('#hint').classList.remove('err');refresh()}
+$('#name').onclick=nextName;
+$('#b2').onclick=()=>record('orig');
+$('#b4').onclick=()=>record('imit');
+$('#b3').onclick=()=>{play(reversed(orig));heard=true;refresh()};
+$('#b5').onclick=()=>{play(reversed(imit),()=>{});if(!cur.done){cur.done=true;rounds++;refresh();window.Arcade&&Arcade.save('say-it-backward',{score:rounds*100,category:cat,total:rounds})}};
+$('#orig').onclick=()=>play(orig);
+$('#share').onclick=async()=>{const file=new File([wav(reversed(imit))],(cur.n.replace(/[^a-z0-9]+/gi,'-')||'name')+'-backward.wav',{type:'audio/wav'});
+ try{if(navigator.canShare&&navigator.canShare({files:[file]}))return await navigator.share({files:[file],title:'Say it backward',text:'Can you guess who this is? 🔁'})}catch(e){if(e.name==='AbortError')return}
+ const a=document.createElement('a');a.href=URL.createObjectURL(file);a.download=file.name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),4000)};
+$('#cats').innerHTML=CATS.map(([k,l])=>`<button class="pill ${k===cat?'on':''}" data-c="${k}" type="button">${l}</button>`).join('');
+document.querySelectorAll('#cats [data-c]').forEach(b=>b.onclick=()=>{cat=b.dataset.c;document.querySelectorAll('#cats [data-c]').forEach(x=>x.classList.toggle('on',x===b));seen.clear();nextName()});
+function setTheme(t){document.documentElement.setAttribute('data-theme',t);$('#theme').textContent=t==='dark'?'☀️':'🌙';try{localStorage.setItem('bs-theme',t)}catch(e){}}
+setTheme(document.documentElement.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
+$('#theme').onclick=()=>setTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');
+nextName();
+</script></body></html>
