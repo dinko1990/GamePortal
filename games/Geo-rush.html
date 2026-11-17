@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Flag Rush — Flags & Country Shapes</title>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Flag Rush — Flags, Shapes & Capitals</title>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&display=swap" rel="stylesheet">
 <script>try{const t=localStorage.getItem('bs-theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
 <style>
@@ -7,16 +7,27 @@
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12111d;--card:#1c1b2c;--ink:#f1f0fa;--mute:#9a98b5;--line:#2e2c46;--logic:#7b93ff;--logic2:#252a55;--color:#ff8366;--color2:#4a2a25;--ok:#32d296;--bad:#ff6b80;color-scheme:dark}}
 :root[data-theme="dark"]{--bg:#12111d;--card:#1c1b2c;--ink:#f1f0fa;--mute:#9a98b5;--line:#2e2c46;--logic:#7b93ff;--logic2:#252a55;--color:#ff8366;--color2:#4a2a25;--ok:#32d296;--bad:#ff6b80;color-scheme:dark}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}body{margin:0;background:var(--bg);color:var(--ink);font-family:'Bricolage Grotesque',system-ui,sans-serif;min-height:100dvh;display:flex;justify-content:center}main{width:min(100%,580px);padding:calc(16px + env(safe-area-inset-top)) 16px calc(32px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:14px}
-a,button{font:inherit}button{cursor:pointer;background:var(--card);color:var(--ink);border:2px solid var(--line);border-radius:16px;padding:12px 14px;font-weight:800}button:disabled{cursor:not-allowed;opacity:.55}button:focus-visible,a:focus-visible{outline:3px solid var(--logic);outline-offset:3px}a{color:var(--logic);text-decoration:none}.top{display:flex;align-items:center;justify-content:space-between;gap:10px}.back{font-size:14px;font-weight:700}.theme{border-radius:99px;padding:7px 12px;font-size:13px}.hero{text-align:center}.hero h1{font-size:clamp(45px,12vw,65px);letter-spacing:-.06em;line-height:1;margin:8px 0 4px}.hero h1 span{color:var(--color)}.subtitle{color:var(--mute);margin:0;font-size:14px}.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.modes button{padding:10px 3px;font-size:clamp(12px,3vw,15px);border-radius:14px}.modes .selected{border-color:var(--logic);background:var(--logic2);color:var(--logic)}.modes .soon{opacity:.5}.panel{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:18px 16px}.setup{display:grid;gap:14px;text-align:center}.setup h2{margin:0;font-size:25px}.setup p{margin:0;color:var(--mute);line-height:1.5}.diffs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.diffs button{font-size:13px;border-radius:12px;padding:10px 4px}.diffs .chosen{background:var(--logic2);border-color:var(--logic);color:var(--logic)}.primary{background:var(--logic);color:white;border-color:var(--logic);font-size:18px}.hud{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}.stat{text-align:center;border:1px solid var(--line);border-radius:14px;background:var(--card);padding:8px 4px;min-width:0}.stat small{display:block;color:var(--mute);font-size:11px;font-weight:700}.stat strong{font-size:clamp(17px,5vw,25px);font-variant-numeric:tabular-nums}.hearts{letter-spacing:2px;color:var(--bad)!important;white-space:nowrap}.progress{height:9px;border-radius:9px;overflow:hidden;background:var(--line)}.progress>div{height:100%;background:var(--logic);width:100%;transition:width .15s linear}.progress.danger>div{background:var(--bad)}.flagStage{min-height:230px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px}.flagStage img{width:min(100%,320px);height:180px;object-fit:contain;filter:drop-shadow(0 5px 9px #0002)}.flagStage svg{width:min(100%,320px);max-height:180px;filter:drop-shadow(0 5px 9px #0002)}.flagStage .emoji{font-size:125px;line-height:1.2}.flagStage #flag{width:100%;display:grid;place-items:center;min-height:155px}.flagStage svg.country-shape{height:185px;width:min(100%,360px);max-height:none;filter:none}.loading-info{font-size:14px;color:var(--mute);text-align:center;max-width:32ch;line-height:1.5}.qmeta{font-size:12px;text-transform:uppercase;color:var(--mute);font-weight:800;letter-spacing:.07em}.feedback{min-height:24px;text-align:center;font-weight:800}.feedback.good{color:var(--ok)}.feedback.bad{color:var(--bad)}.choices{display:grid;grid-template-columns:1fr 1fr;gap:9px}.choices button{font-size:clamp(14px,3.6vw,18px);line-height:1.15;min-height:67px;padding:10px 7px}.choices button.right{background:color-mix(in srgb,var(--ok) 18%,var(--card));border-color:var(--ok)}.choices button.wrong{background:color-mix(in srgb,var(--bad) 18%,var(--card));border-color:var(--bad)}.choices.lock button{pointer-events:none}.end{text-align:center;display:grid;gap:12px}.end h2{font-size:38px;margin:0}.end .big{font-size:66px;font-weight:800;color:var(--logic)}.end p{margin:0;color:var(--mute)}.foot{font-size:12px;text-align:center;color:var(--mute);line-height:1.45}.hidden{display:none!important}@media(max-width:370px){.flagStage{min-height:185px}.flagStage img{height:145px}.flagStage svg{max-height:145px}.panel{padding:14px 12px}.choices button{min-height:58px}}@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+a,button{font:inherit}button{cursor:pointer;background:var(--card);color:var(--ink);border:2px solid var(--line);border-radius:16px;padding:12px 14px;font-weight:800}button:disabled{cursor:not-allowed;opacity:.55}button:focus-visible,a:focus-visible{outline:3px solid var(--logic);outline-offset:3px}a{color:var(--logic);text-decoration:none}.top{display:flex;align-items:center;justify-content:space-between;gap:10px}.back{font-size:14px;font-weight:700}.theme{border-radius:99px;padding:7px 12px;font-size:13px}.hero{text-align:center}.hero h1{font-size:clamp(45px,12vw,65px);letter-spacing:-.06em;line-height:1;margin:8px 0 4px}.hero h1 span{color:var(--color)}.subtitle{color:var(--mute);margin:0;font-size:14px}.modes{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}.modes button{padding:10px 3px;font-size:clamp(12px,3vw,15px);border-radius:14px}.modes .selected{border-color:var(--logic);background:var(--logic2);color:var(--logic)}.modes .soon{opacity:.5}.panel{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:18px 16px}.setup{display:grid;gap:14px;text-align:center}.setup h2{margin:0;font-size:25px}.setup p{margin:0;color:var(--mute);line-height:1.5}.diffs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.diffs button{font-size:13px;border-radius:12px;padding:10px 4px}.diffs .chosen{background:var(--logic2);border-color:var(--logic);color:var(--logic)}.primary{background:var(--logic);color:white;border-color:var(--logic);font-size:18px}.hud{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}.stat{text-align:center;border:1px solid var(--line);border-radius:14px;background:var(--card);padding:8px 4px;min-width:0}.stat small{display:block;color:var(--mute);font-size:11px;font-weight:700}.stat strong{font-size:clamp(17px,5vw,25px);font-variant-numeric:tabular-nums}.hearts{letter-spacing:2px;color:var(--bad)!important;white-space:nowrap}.progress{height:9px;border-radius:9px;overflow:hidden;background:var(--line)}.progress>div{height:100%;background:var(--logic);width:100%;transition:width .15s linear}.progress.danger>div{background:var(--bad)}.flagStage{min-height:230px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px}.flagStage img{width:min(100%,320px);height:180px;object-fit:contain;filter:drop-shadow(0 5px 9px #0002)}.flagStage svg{width:min(100%,320px);max-height:180px;filter:drop-shadow(0 5px 9px #0002)}.flagStage .emoji{font-size:125px;line-height:1.2}.flagStage #flag{width:100%;display:grid;place-items:center;min-height:155px}.flagStage svg.country-shape{height:185px;width:min(100%,360px);max-height:none;filter:none}.loading-info{font-size:14px;color:var(--mute);text-align:center;max-width:32ch;line-height:1.5}.qmeta{font-size:12px;text-transform:uppercase;color:var(--mute);font-weight:800;letter-spacing:.07em}.feedback{min-height:24px;text-align:center;font-weight:800}.feedback.good{color:var(--ok)}.feedback.bad{color:var(--bad)}.choices{display:grid;grid-template-columns:1fr 1fr;gap:9px}.choices button{font-size:clamp(14px,3.6vw,18px);line-height:1.15;min-height:67px;padding:10px 7px}.choices button.right{background:color-mix(in srgb,var(--ok) 18%,var(--card));border-color:var(--ok)}.choices button.wrong{background:color-mix(in srgb,var(--bad) 18%,var(--card));border-color:var(--bad)}.choices.lock button{pointer-events:none}.end{text-align:center;display:grid;gap:12px}.end h2{font-size:38px;margin:0}.end .big{font-size:66px;font-weight:800;color:var(--logic)}.end p{margin:0;color:var(--mute)}.foot{font-size:12px;text-align:center;color:var(--mute);line-height:1.45}.hidden{display:none!important}@media(max-width:370px){.flagStage{min-height:185px}.flagStage img{height:145px}.flagStage svg{max-height:145px}.panel{padding:14px 12px}.choices button{min-height:58px}}@media(prefers-reduced-motion:reduce){*{transition:none!important}}
 .mx{width:100%;border-collapse:collapse;font-size:12px}.mx th,.mx td{padding:8px 3px;text-align:center;border:1px solid var(--line)}.mx th{color:var(--mute);font-weight:800;font-size:11px}.mx td{font-weight:800;cursor:pointer}.mx td.todo{color:var(--logic);background:var(--logic2)}.mx td:hover{outline:2px solid var(--logic)}.mxnote{font-size:12px;color:var(--mute);margin-top:6px}
+@keyframes fin{from{opacity:0;transform:translateY(8px) scale(.96)}to{opacity:1;transform:none}}@keyframes pulse{50%{transform:scale(1.05)}}@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.flagStage #flag>*{animation:fin .25s ease-out}.choices button.right{animation:pulse .35s}.choices button.wrong{animation:shake .3s}
+.qname{font-weight:800;font-size:clamp(20px,6vw,28px);text-align:center}.qsub{color:var(--mute);font-size:13px;text-align:center}.qbig{font-size:clamp(30px,10vw,48px);font-weight:800;letter-spacing:-.03em;text-align:center;line-height:1.05;color:var(--logic)}
+.flagStage.compact{min-height:0}.flagStage.compact img,.flagStage.compact svg:not(.country-shape){height:100px}.flagStage.compact .emoji{font-size:72px}.flagStage.compact #flag{min-height:100px}
+.wordle{display:flex;flex-direction:column;gap:8px}.wrow{display:flex;gap:3px;justify-content:center;flex-wrap:wrap;margin-bottom:3px}.wgap{width:8px}
+.tile{width:clamp(20px,6vw,28px);height:clamp(24px,7vw,32px);display:grid;place-items:center;font-weight:800;text-transform:uppercase;border-radius:7px;background:var(--card);border:2px solid var(--line);font-size:clamp(12px,3.6vw,16px)}
+.tile.g{background:var(--ok);border-color:var(--ok);color:#fff}.tile.y{background:#f2b632;border-color:#f2b632;color:#fff}.tile.x{background:var(--mute);border-color:var(--mute);color:#fff}
+.wform{display:flex;gap:8px}.wform input{flex:1;min-width:0;border:2px solid var(--line);border-radius:14px;padding:12px;font:inherit;font-size:17px;background:var(--card);color:var(--ink)}.wform button{white-space:nowrap}.whint{text-align:center;color:var(--mute);font-size:13px}
+#fifty{width:100%;padding:9px;font-size:14px;border-radius:12px}#rm{font-size:12px;padding:6px 10px;border-radius:10px;border-width:1px;opacity:.8}
+.missed{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}.missed span{background:var(--logic2);color:var(--logic);border-radius:99px;padding:4px 10px;font-size:13px;font-weight:700}
+@media(prefers-reduced-motion:reduce){.flagStage #flag>*,.choices button.right,.choices button.wrong{animation:none}}
 </style></head><body><main>
 <div class="top"><span id="arcade-header"></span><button id="theme" class="theme" type="button">Theme</button></div>
-<header class="hero"><h1>Flag <span>Rush</span></h1><p class="subtitle">Current flags, historic flags & country shapes. Three hearts. One high score.</p></header>
-<nav class="modes" aria-label="Game mode"><button id="mode-current" class="selected" type="button">🌎 Current flags</button><button id="mode-old" type="button">🏛️ Old flags</button><button id="mode-shapes" type="button">🗺️ Country shapes</button></nav>
-<section id="setup" class="panel setup"><h2 id="setup-title">Current flags</h2><p id="setup-description">Start with familiar countries, or challenge yourself with smaller ones.</p><div class="diffs"><button data-diff="easy" class="chosen">Easy</button><button data-diff="medium">Medium</button><button data-diff="hard">Hard</button></div><p id="detail">Population-based approximate tiers · 15 seconds per flag</p><div>Best score: <b id="setup-best">0</b></div><button class="primary" id="play">Start playing →</button><div id="offline" class="foot"></div><button id="dl" class="hidden" type="button">⬇ Save for offline play</button><div id="matrix"></div></section>
-<section id="game" class="hidden"><div class="hud"><div class="stat"><small>SCORE</small><strong id="score">0</strong></div><div class="stat"><small>HEARTS</small><strong class="hearts" id="hearts">♥ ♥ ♥</strong></div><div class="stat"><small>TIME</small><strong id="time">15.0</strong></div></div><div class="progress" id="timerbar"><div id="timerfill"></div></div><div class="panel flagStage"><div class="qmeta" id="round">Flag 1 · Easy</div><div id="flag"></div><div class="feedback" id="feedback" aria-live="polite"></div></div><div class="choices" id="choices"></div></section>
-<section id="finish" class="panel end hidden"><h2>Run over!</h2><div class="big" id="finalscore">0</div><p id="finishtext"></p><p id="besttext"></p><button class="primary" id="retry">Play again →</button><button id="switch">Change mode / difficulty</button></section>
-<footer class="foot">Scores saved on this device · 3 hearts · Fast answers score more points.<br>Flags: FlagCDN · historic flags: Wikimedia Commons · outlines: Natural Earth. Tap “Save for offline play” once to play without internet ✈️. Sources and licensing vary by image. v2.0</footer>
+<header class="hero"><h1>Flag <span>Rush</span></h1><p class="subtitle">Flags, old flags, shapes & capitals. Three hearts. One high score.</p></header>
+<nav class="modes" aria-label="Game mode"><button id="mode-current" class="selected" type="button">🌎 Current flags</button><button id="mode-old" type="button">🏛️ Old flags</button><button id="mode-shapes" type="button">🗺️ Country shapes</button><button id="mode-capitals" type="button">🏙️ Capitals</button></nav>
+<section id="setup" class="panel setup"><h2 id="setup-title">Current flags</h2><p id="setup-description">Start with familiar countries, or challenge yourself with smaller ones.</p><div class="diffs hidden" id="captype"><button data-cap="cap">Pick capital</button><button data-cap="capr">Pick country</button><button data-cap="capw">Type it</button></div><div class="diffs"><button data-diff="easy" class="chosen">Easy</button><button data-diff="medium">Medium</button><button data-diff="hard">Hard</button></div><p id="detail">Population-based approximate tiers · 15 seconds per flag</p><div>Best score: <b id="setup-best">0</b></div><button class="primary" id="play">Start playing →</button><div id="offline" class="foot"></div><button id="dl" class="hidden" type="button">⬇ Save for offline play</button><button id="rm" class="hidden" type="button">Remove offline data</button><div id="matrix"></div></section>
+<section id="game" class="hidden"><div class="hud"><div class="stat"><small>SCORE</small><strong id="score">0</strong></div><div class="stat"><small>HEARTS</small><strong class="hearts" id="hearts">♥ ♥ ♥</strong></div><div class="stat"><small>TIME</small><strong id="time">15.0</strong></div></div><div class="progress" id="timerbar"><div id="timerfill"></div></div><div class="panel flagStage"><div class="qmeta" id="round">Flag 1 · Easy</div><div id="flag"></div><div class="feedback" id="feedback" aria-live="polite"></div></div><div class="choices" id="choices"></div><button id="fifty" type="button">½ 50/50 lifeline (1 per run)</button></section>
+<section id="finish" class="panel end hidden"><h2>Run over!</h2><div class="big" id="finalscore">0</div><p id="finishtext"></p><p id="besttext"></p><div id="missed" class="missed"></div><button class="primary" id="retry">Play again →</button><button id="switch">Change mode / difficulty</button></section>
+<footer class="foot">Scores saved on this device · 3 hearts · Fast answers score more points.<br>Flags: FlagCDN · historic flags: Wikimedia Commons · outlines: Natural Earth. Tap “Save for offline play” once to play without internet ✈️. Sources and licensing vary by image. v3.0</footer>
 </main><script>
 const W=90,H=60;
 const rc=(x,y,w,h,f)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${f}"/>`;
@@ -146,18 +157,28 @@ function shapeMarkup(geom){
 const preloadImage=url=>new Promise(resolve=>{const img=new Image();let done=false;const finish=ok=>{if(done)return;done=true;clearTimeout(t);resolve(ok)};const t=setTimeout(()=>finish(false),5000);img.onload=()=>finish(true);img.onerror=()=>finish(false);img.src=url});
 let mode='current',difficulty='easy',session=null,timerId=null,nextId=null;
 const timeLimits={easy:15,medium:12,hard:9}, points={easy:100,medium:160,hard:240};
+/* ---------- capitals (first name is shown; the others are also accepted when typing) ---------- */
+const CAP=Object.fromEntries("India=New Delhi|China=Beijing|United States=Washington D.C./Washington|Indonesia=Jakarta|Pakistan=Islamabad|Nigeria=Abuja|Brazil=Brasilia|Bangladesh=Dhaka|Russia=Moscow|Ethiopia=Addis Ababa|Mexico=Mexico City|Japan=Tokyo|Egypt=Cairo|Philippines=Manila|DR Congo=Kinshasa|Vietnam=Hanoi|Iran=Tehran|Turkey=Ankara|Germany=Berlin|Thailand=Bangkok|United Kingdom=London|Tanzania=Dodoma/Dar es Salaam|France=Paris|South Africa=Pretoria/Cape Town/Bloemfontein|Italy=Rome|Kenya=Nairobi|Myanmar=Naypyidaw/Nay Pyi Taw|Colombia=Bogota|South Korea=Seoul|Sudan=Khartoum|Uganda=Kampala|Spain=Madrid|Algeria=Algiers|Iraq=Baghdad|Argentina=Buenos Aires|Afghanistan=Kabul|Yemen=Sanaa|Canada=Ottawa|Poland=Warsaw|Morocco=Rabat|Angola=Luanda|Ukraine=Kyiv/Kiev|Uzbekistan=Tashkent|Malaysia=Kuala Lumpur/Putrajaya|Mozambique=Maputo|Ghana=Accra|Peru=Lima|Saudi Arabia=Riyadh|Madagascar=Antananarivo|Ivory Coast=Yamoussoukro/Abidjan|Nepal=Kathmandu|Cameroon=Yaounde|Venezuela=Caracas|Niger=Niamey|Australia=Canberra|North Korea=Pyongyang|Syria=Damascus|Mali=Bamako|Burkina Faso=Ouagadougou|Sri Lanka=Colombo/Sri Jayawardenepura Kotte|Malawi=Lilongwe|Zambia=Lusaka|Kazakhstan=Astana/Nur-Sultan|Chad=N'Djamena/Ndjamena|Chile=Santiago|Romania=Bucharest|Somalia=Mogadishu|Senegal=Dakar|Guatemala=Guatemala City|Netherlands=Amsterdam|Ecuador=Quito|Cambodia=Phnom Penh|Zimbabwe=Harare|Guinea=Conakry|Benin=Porto-Novo/Cotonou|Rwanda=Kigali|Burundi=Gitega/Bujumbura|Tunisia=Tunis|Bolivia=La Paz/Sucre|Belgium=Brussels|Haiti=Port-au-Prince|Cuba=Havana|South Sudan=Juba|Dominican Republic=Santo Domingo|Czechia=Prague|Greece=Athens|Portugal=Lisbon|Jordan=Amman|Azerbaijan=Baku|Sweden=Stockholm|Honduras=Tegucigalpa|United Arab Emirates=Abu Dhabi|Hungary=Budapest|Tajikistan=Dushanbe|Belarus=Minsk|Austria=Vienna|Papua New Guinea=Port Moresby|Serbia=Belgrade|Israel=Jerusalem|Switzerland=Bern/Berne|Taiwan=Taipei|Togo=Lome|Sierra Leone=Freetown|Laos=Vientiane|Paraguay=Asuncion|Bulgaria=Sofia|Libya=Tripoli|Lebanon=Beirut|Nicaragua=Managua|Kyrgyzstan=Bishkek|El Salvador=San Salvador|Turkmenistan=Ashgabat|Singapore=Singapore|Denmark=Copenhagen|Finland=Helsinki|Congo (Republic)=Brazzaville|Slovakia=Bratislava|Norway=Oslo|Oman=Muscat|Costa Rica=San Jose|Liberia=Monrovia|Ireland=Dublin|Central African Republic=Bangui|New Zealand=Wellington|Mauritania=Nouakchott|Panama=Panama City|Kuwait=Kuwait City|Croatia=Zagreb|Moldova=Chisinau|Georgia=Tbilisi|Eritrea=Asmara|Uruguay=Montevideo|Mongolia=Ulaanbaatar/Ulan Bator|Bosnia and Herzegovina=Sarajevo|Armenia=Yerevan|Jamaica=Kingston|Albania=Tirana|Qatar=Doha|Lithuania=Vilnius|Namibia=Windhoek|Gambia=Banjul|Botswana=Gaborone|Gabon=Libreville|Lesotho=Maseru|North Macedonia=Skopje|Slovenia=Ljubljana|Guinea-Bissau=Bissau|Latvia=Riga|Bahrain=Manama|Kosovo=Pristina/Prishtina|Equatorial Guinea=Malabo|Trinidad and Tobago=Port of Spain|Estonia=Tallinn|Timor-Leste=Dili|Mauritius=Port Louis|Cyprus=Nicosia|Eswatini=Mbabane/Lobamba|Djibouti=Djibouti|Fiji=Suva|Comoros=Moroni|Guyana=Georgetown|Bhutan=Thimphu|Solomon Islands=Honiara|Montenegro=Podgorica|Luxembourg=Luxembourg|Suriname=Paramaribo|Cabo Verde=Praia|Malta=Valletta|Brunei=Bandar Seri Begawan|Belize=Belmopan|Bahamas=Nassau|Maldives=Male|Iceland=Reykjavik|Vanuatu=Port Vila|Barbados=Bridgetown|Sao Tome and Principe=Sao Tome|Samoa=Apia|Saint Lucia=Castries|Kiribati=Tarawa/South Tarawa|Grenada=St. George's/Saint George's|Micronesia=Palikir|Tonga=Nukualofa|Seychelles=Victoria|Saint Vincent and the Grenadines=Kingstown|Antigua and Barbuda=St. John's/Saint John's|Andorra=Andorra la Vella|Dominica=Roseau|Marshall Islands=Majuro|Saint Kitts and Nevis=Basseterre|Liechtenstein=Vaduz|Monaco=Monaco|San Marino=San Marino|Palau=Ngerulmud|Tuvalu=Funafuti|Nauru=Yaren|Vatican City=Vatican City".split("|").map(t=>{const i=t.indexOf("=");return[t.slice(0,i),t.slice(i+1).split("/")]}));
+const norm=t=>String(t).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z]/g,"");
+const esc=t=>String(t).replace(/[&<>"']/g,c=>"&#"+c.charCodeAt(0)+";");
+const isCap=m=>m==="cap"||m==="capr"||m==="capw";let capMode="cap";
+const MODE_TITLES={current:"Current flags",old:"Old flags",shapes:"Country shapes",cap:"Capitals · pick the capital",capr:"Capitals · pick the country",capw:"Capitals · Wordle"};
+const tl=()=>timeLimits[difficulty]+(mode==="capw"?30:0); // typing needs more time
 function storeKey(){return 'flag-rush:best:v2:'+mode+':'+difficulty}
 function best(){try{return +(localStorage.getItem(storeKey())||0)}catch(e){return 0}}
 function setBest(n){try{localStorage.setItem(storeKey(),String(n))}catch(e){}}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 function selectedPool(){if(mode==='old')return oldFlags;return currentCountries.filter(x=>difficulty==='easy'?easySet.has(x.name):difficulty==='medium'?mediumSet.has(x.name):!easySet.has(x.name)&&!mediumSet.has(x.name))}
 function updateSetup(){
- $('#setup-title').textContent=mode==='current'?'Current flags':mode==='old'?'Old flags':'Country shapes';
- $('#setup-description').textContent=mode==='current'?'Pick a difficulty based roughly on country population.':mode==='old'?'Identify historical national flags. The years are shown as a clue.':'Guess the country from its outline.';
- $('#detail').textContent=(mode==='current'?'Population tiers ('+selectedPool().length+' flags)':mode==='old'?(LOCAL?'Historic flags · works offline':'Historic flags · online image library'):(LOCAL&&LOCAL.shapes?'Population tiers · works offline':'Population tiers · online country outlines'))+' · '+timeLimits[difficulty]+' seconds per round';
+ const cap=isCap(mode);
+ $('#setup-title').textContent=MODE_TITLES[mode];
+ $('#setup-description').textContent=({current:'Pick a difficulty based roughly on country population.',old:'Identify historical national flags. The years are shown as a clue.',shapes:'Guess the country from its outline.',cap:'See a country, pick its capital city.',capr:'See a capital city, pick its country.',capw:'See a country and type its capital, Wordle style. 6 tries.'})[mode];
+ $('#detail').textContent=(mode==='old'?(LOCAL?'Historic flags · works offline':'Historic flags · online image library'):mode==='shapes'?(LOCAL&&LOCAL.shapes?'Population tiers · works offline':'Population tiers · online country outlines'):'Population tiers ('+selectedPool().length+' countries)')+' · '+tl()+' seconds per round';
  $('#setup-best').textContent=best();
  document.querySelectorAll('[data-diff]').forEach(b=>b.classList.toggle('chosen',b.dataset.diff===difficulty));
- $('#mode-current').classList.toggle('selected',mode==='current');$('#mode-old').classList.toggle('selected',mode==='old');$('#mode-shapes').classList.toggle('selected',mode==='shapes');renderMatrix();offlineUI();
+ ['current','old','shapes'].forEach(m=>$('#mode-'+m).classList.toggle('selected',mode===m));$('#mode-capitals').classList.toggle('selected',cap);
+ $('#captype').classList.toggle('hidden',!cap);document.querySelectorAll('[data-cap]').forEach(b=>b.classList.toggle('chosen',b.dataset.cap===mode));
+ renderMatrix();offlineUI();
 }
 function clearTimers(){if(timerId!==null){clearInterval(timerId);timerId=null}if(nextId!==null){clearTimeout(nextId);nextId=null}}
 function scene(id){['setup','game','finish'].forEach(x=>$('#'+x).classList.toggle('hidden',x!==id))}
@@ -168,7 +189,7 @@ async function begin(){
   try{await loadShapes()}catch(e){$('#detail').textContent='Could not load map shapes. Check your internet and tap Start again.';$('#play').disabled=false;return}
  }
  $('#play').disabled=false;
- session={score:0,hearts:3,question:0,used:new Set(),last:null,locked:false,remaining:timeLimits[difficulty],start:0,endsAt:0,skipped:0};scene('game');newQuestion();
+ session={score:0,hearts:3,question:0,used:new Set(),last:null,locked:false,remaining:tl(),start:0,endsAt:0,skipped:0,streak:0,fifty:true,missed:[]};scene('game');newQuestion();
 }
 function chooseQuestion(){const pool=selectedPool();if(pool.length===0)return null;
  let available=pool.filter(x=>!session.used.has(x.name) && (mode!=='shapes'||shapesByCode.has(x.code)) && (mode!=='old'||!badHistorical.has(x.local||x.file)));
@@ -184,7 +205,7 @@ function flagMarkup(q){if(mode==='shapes')return shapeMarkup(shapesByCode.get(q.
  return q.svg?fallback:`<img alt="Flag to identify" src="https://flagcdn.com/w320/${q.code.toLowerCase()}.png" onerror="this.outerHTML=decodeURIComponent(this.dataset.fallback)" data-fallback="${encodeURIComponent(fallback)}">`;
 }
 async function newQuestion(){
- if(!session||session.hearts<=0)return end();clearTimers();session.locked=true;session.remaining=timeLimits[difficulty];
+ if(!session||session.hearts<=0)return end();clearTimers();session.locked=true;session.remaining=tl();
  let q=null;
  // Preload each Wikimedia file before allowing answers or starting the clock.
  for(let tries=0;tries<(mode==='old'?oldFlags.length:1);tries++){
@@ -196,33 +217,72 @@ async function newQuestion(){
  }
  if(!session)return;
  if(!q){$('#round').textContent='Images unavailable';$('#flag').innerHTML='<span class="loading-info">Could not load the historical flag images. Check your connection and try again.</span>';$('#choices').innerHTML='<button class="primary" style="grid-column:1/-1" id="backSetup">Back to menu</button>';$('#backSetup').onclick=backToSetup;return}
- session.question++;session.q=q;session.locked=false;
- $('#round').textContent=`${mode==='shapes'?'Shape':'Flag'} ${session.question} · ${difficulty[0].toUpperCase()+difficulty.slice(1)}${mode==='old'?' · '+q.period:''}`;
- $('#flag').innerHTML=flagMarkup(q);$('#feedback').textContent='';$('#feedback').className='feedback';$('#choices').innerHTML='';$('#choices').className='choices';
- const pool=mode==='old'?oldFlags:currentCountries;
- const seen=new Set([q.name]),wrong=[];for(const x of shuffle(pool.slice())){if(!seen.has(x.name)){seen.add(x.name);wrong.push(x);if(wrong.length===3)break}}
- shuffle([q,...wrong]).forEach(a=>{const btn=document.createElement('button');btn.textContent=a.name;btn.type='button';btn.addEventListener('click',()=>answer(a.name,btn));$('#choices').appendChild(btn)});
+ const isc=isCap(mode),alts=isc?(CAP[q.name]||['?']):null;
+ session.question++;session.q=q;session.locked=false;session.tries=0;session.wbonus=0;session.correct=mode==='cap'?alts[0]:q.name;
+ document.querySelector('.flagStage').classList.toggle('compact',mode==='cap'||mode==='capw');
+ $('#round').textContent=`${mode==='shapes'?'Shape':isc?'Country':'Flag'} ${session.question} · ${difficulty[0].toUpperCase()+difficulty.slice(1)}${mode==='old'?' · '+q.period:''}`;
+ $('#flag').innerHTML=mode==='capr'?`<div class="qbig">${esc(alts[0])}</div><div class="qsub">is the capital of…</div>`:mode==='cap'?`${flagMarkup(q)}<div class="qname">${esc(q.name)}</div><div class="qsub">What is its capital?</div>`:mode==='capw'?`${flagMarkup(q)}<div class="qname">${esc(q.name)}</div>`:flagMarkup(q);
+ $('#feedback').textContent='';$('#feedback').className='feedback';
+ $('#fifty').classList.toggle('hidden',mode==='capw');$('#fifty').disabled=!session.fifty;$('#fifty').textContent=session.fifty?'½ 50/50 lifeline (1 per run)':'50/50 used';
+ if(mode==='capw')buildWordle(alts);
+ else{
+  $('#choices').innerHTML='';$('#choices').className='choices';
+  const pool=mode==='old'?oldFlags:currentCountries,labels=[session.correct],seen=new Set(labels);
+  for(const x of shuffle(pool.slice())){const l=mode==='cap'?(CAP[x.name]||[''])[0]:x.name;if(l&&!seen.has(l)){seen.add(l);labels.push(l);if(labels.length===4)break}}
+  shuffle(labels).forEach(l=>{const btn=document.createElement('button');btn.textContent=l;btn.type='button';btn.addEventListener('click',()=>answer(l,btn));$('#choices').appendChild(btn)});
+ }
  updateHud();session.endsAt=performance.now()+session.remaining*1000;timerId=setInterval(tick,75);
 }
-function updateHud(){if(!session)return;$('#score').textContent=session.score;$('#hearts').textContent='♥ '.repeat(session.hearts).trim()+'♡ '.repeat(3-session.hearts).trim();$('#time').textContent=Math.max(0,session.remaining).toFixed(1);const fraction=Math.max(0,session.remaining/timeLimits[difficulty]);$('#timerfill').style.width=(fraction*100)+'%';$('#timerbar').classList.toggle('danger',fraction<.3)}
+/* Wordle for capitals */
+function wscore(g,a){const r=Array(a.length).fill('x'),c={};for(let i=0;i<a.length;i++){if(g[i]===a[i])r[i]='g';else c[a[i]]=(c[a[i]]||0)+1}for(let i=0;i<a.length;i++)if(r[i]!=='g'&&c[g[i]]>0){r[i]='y';c[g[i]]--}return r}
+function wrow(g,res,words){let i=0,h='<div class="wrow">';words.forEach((n,w)=>{if(w)h+='<span class="wgap"></span>';for(let j=0;j<n;j++,i++)h+=`<span class="tile ${res[i]||''}">${g[i]||''}</span>`});return h+'</div>'}
+function buildWordle(alts){
+ const ans=norm(alts[0]),words=alts[0].split(/[\s-]+/).map(w=>norm(w).length).filter(Boolean);
+ session.ans=ans;session.alts=alts.map(norm);session.words=words;session.wguesses=[];
+ const c=$('#choices');c.className='wordle';
+ c.innerHTML='<div id="wrows"></div><div class="wform"><input id="wi" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="go" placeholder="Type the capital"><button class="primary" id="wgo" type="button">Check</button></div><div class="whint" id="whint"></div>';
+ $('#whint').textContent=`Starts with “${alts[0][0].toUpperCase()}” · ${ans.length} letters · 6 tries`;
+ $('#wgo').onclick=wsubmit;$('#wi').onkeydown=e=>{if(e.key==='Enter')wsubmit()};
+ setTimeout(()=>{try{$('#wi').focus({preventScroll:true})}catch(e){}},50);
+}
+function wsubmit(){
+ if(!session||session.locked||mode!=='capw')return;const g=norm($('#wi').value);if(!g)return;
+ if(session.alts.includes(g)){session.wbonus=(6-session.tries)*15;return answer(session.correct,null)} // accepts alternatives like Bern / Berne
+ if(g.length!==session.ans.length){$('#whint').textContent='Need exactly '+session.ans.length+' letters';return}
+ session.tries++;session.wguesses.push({g,res:wscore(g,session.ans)});$('#wi').value='';
+ $('#wrows').innerHTML=session.wguesses.map(x=>wrow(x.g,x.res,session.words)).join('');
+ $('#whint').textContent=(6-session.tries)+' tries left';
+ if(session.tries>=6)answer('✗',null);
+}
+function updateHud(){if(!session)return;$('#score').textContent=session.score;$('#hearts').textContent='♥ '.repeat(session.hearts).trim()+'♡ '.repeat(3-session.hearts).trim();$('#time').textContent=Math.max(0,session.remaining).toFixed(1);const fraction=Math.max(0,session.remaining/tl());$('#timerfill').style.width=(fraction*100)+'%';$('#timerbar').classList.toggle('danger',fraction<.3)}
 function tick(){if(!session||session.locked)return;session.remaining=Math.max(0,(session.endsAt-performance.now())/1000);updateHud();if(session.remaining<=0)answer(null,null)}
+function missLabel(q){const a=CAP[q.name]||['?'];return mode==='cap'?`${q.name} → ${a[0]}`:mode==='capr'?`${a[0]} → ${q.name}`:mode==='capw'?`${q.name} → ${a[0]}`:q.name+(mode==='old'?' ('+q.period+')':'')}
 function answer(name,button){if(!session||session.locked)return;session.locked=true;clearInterval(timerId);timerId=null;
- const ok=name===session.q.name;
- if(ok){const gained=points[difficulty]+Math.ceil(session.remaining)*10;session.score+=gained;$('#feedback').textContent=`Correct! +${gained}`;$('#feedback').classList.add('good')}
- else{session.hearts--;$('#feedback').textContent=(name===null?'Time’s up!':'Not quite!')+' '+session.q.name;$('#feedback').classList.add('bad')}
- for(const b of $('#choices').children){b.disabled=true;if(b.textContent===session.q.name)b.classList.add('right');else if(b===button&&!ok)b.classList.add('wrong')}
+ const ok=name===session.correct,fb=$('#feedback');
+ if(ok){session.streak++;const gained=points[difficulty]+Math.ceil(session.remaining)*10+Math.min(session.streak-1,10)*15+(session.wbonus||0);session.wbonus=0;session.score+=gained;fb.textContent=`Correct! +${gained}`+(session.streak>=3?` · 🔥 ${session.streak} in a row`:'');fb.classList.add('good')}
+ else{session.streak=0;session.hearts--;session.missed.push(missLabel(session.q));fb.textContent=(name===null?'Time’s up! ':'Not quite! ')+session.correct;fb.classList.add('bad');try{navigator.vibrate&&navigator.vibrate(40)}catch(e){}}
+ if(mode==='capw'){const i=$('#wi'),g=$('#wgo');if(i)i.disabled=true;if(g)g.disabled=true;if(!ok)$('#wrows').insertAdjacentHTML('beforeend',wrow(session.ans,session.ans.split('').map(()=>'g'),session.words))}
+ else for(const b of $('#choices').children){b.disabled=true;if(b.textContent===session.correct)b.classList.add('right');else if(b===button&&!ok)b.classList.add('wrong')}
+ $('#fifty').disabled=true;
  updateHud();nextId=setTimeout(()=>session.hearts<=0?end():newQuestion(),ok?850:1500);
 }
-function end(){clearTimers();if(!session)return;const old=best();const record=session.score>old;if(record)setBest(session.score);window.Arcade&&Arcade.save('flag-rush',{score:session.score,mode:difficulty,category:mode,total:session.question}).then(loadCloud);$('#finalscore').textContent=session.score.toLocaleString();$('#finishtext').textContent=`${session.question} flags played · ${mode==='current'?'Current flags':mode==='old'?'Old flags':'Country shapes'} · ${difficulty}`;$('#besttext').textContent=record?'🏆 New personal best!':'Best: '+Math.max(old,session.score).toLocaleString();scene('finish')}
+function end(){clearTimers();if(!session)return;const old=best();const record=session.score>old;if(record)setBest(session.score);
+ window.Arcade&&Arcade.save('flag-rush',{score:session.score,mode:difficulty,category:mode,total:session.question}).then(loadCloud);
+ $('#finalscore').textContent=session.score.toLocaleString();$('#finishtext').textContent=`${session.question} played · ${MODE_TITLES[mode]} · ${difficulty}`;
+ $('#besttext').textContent=record?'🏆 New personal best!':'Best: '+Math.max(old,session.score).toLocaleString();
+ const m=session.missed;$('#missed').innerHTML=m.length?'<div class="foot" style="width:100%">Review these:</div>'+m.slice(0,14).map(x=>'<span>'+esc(x)+'</span>').join('')+(m.length>14?'<span>+'+(m.length-14)+' more</span>':''):'';
+ scene('finish')}
 function backToSetup(){clearTimers();session=null;scene('setup');updateSetup()}
 $('#play').onclick=begin;$('#retry').onclick=begin;$('#switch').onclick=backToSetup;
 $('#mode-current').onclick=()=>{mode='current';backToSetup()};$('#mode-old').onclick=()=>{mode='old';backToSetup()};$('#mode-shapes').onclick=()=>{mode='shapes';backToSetup()};
+$('#mode-capitals').onclick=()=>{mode=capMode;backToSetup()};document.querySelectorAll('[data-cap]').forEach(b=>b.onclick=()=>{capMode=mode=b.dataset.cap;updateSetup()});
+$('#fifty').onclick=()=>{if(!session||session.locked||!session.fifty||mode==='capw')return;session.fifty=false;const w=[...$('#choices').children].filter(b=>b.textContent!==session.correct&&!b.disabled);shuffle(w).slice(0,2).forEach(b=>{b.disabled=true;b.style.visibility='hidden'});$('#fifty').disabled=true;$('#fifty').textContent='50/50 used'};
 document.querySelectorAll('[data-diff]').forEach(b=>b.onclick=()=>{difficulty=b.dataset.diff;updateSetup()});
 function setTheme(t){document.documentElement.dataset.theme=t;$('#theme').textContent=t==='dark'?'☀️ Light':'🌙 Dark';try{localStorage.setItem('bs-theme',t)}catch(e){}}
 setTheme(document.documentElement.dataset.theme||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'));
 $('#theme').onclick=()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');
 document.addEventListener('visibilitychange',()=>{if(!session||session.locked)return;if(document.hidden){session.remaining=Math.max(0,(session.endsAt-performance.now())/1000);clearInterval(timerId);timerId=null}else{session.endsAt=performance.now()+session.remaining*1000;timerId=setInterval(tick,75)}});
-const MODES=[['current','🌎 Current flags'],['old','🏛️ Old flags'],['shapes','🗺️ Country shapes']],DIFFS=['easy','medium','hard'];
+const MODES=[['current','🌎 Current flags'],['old','🏛️ Old flags'],['shapes','🗺️ Country shapes'],['cap','🏙️ Pick capital'],['capr','🏙️ Pick country'],['capw','🔤 Type capital']],DIFFS=['easy','medium','hard'];
 let cloud={};
 const bestOf=(m,d)=>{if(window.Arcade&&Arcade.user)return cloud[m+d]||0;try{return +(localStorage.getItem('flag-rush:best:v2:'+m+':'+d)||0)}catch(e){return 0}};
 function renderMatrix(){
@@ -230,8 +290,8 @@ function renderMatrix(){
  const top={};DIFFS.forEach(d=>top[d]=Math.max(0,...MODES.map(([m])=>bestOf(m,d))));
  let n=0,h='<table class="mx"><tr><th>Best scores</th>'+DIFFS.map(d=>`<th>${d[0].toUpperCase()+d.slice(1)}</th>`).join('')+'</tr>';
  MODES.forEach(([m,label])=>{h+=`<tr><th>${label}</th>`+DIFFS.map(d=>{const b=bestOf(m,d),a=`data-m="${m}" data-d="${d}"`;if(!b)return `<td class="todo" ${a}>play!</td>`;n++;return `<td ${a} style="background:color-mix(in srgb,var(--ok) ${Math.round(18+57*b/top[d])}%,transparent)">${b===top[d]?'👑 ':''}${b.toLocaleString()}</td>`}).join('')+'</tr>'});
- el.innerHTML=h+`</table><div class="mxnote">${n===9?'🏆 All 9 played!':n+' / 9 played · tap a cell to play it'} · darker = higher · 👑 = best in the column</div>`;
- el.querySelectorAll('td[data-m]').forEach(td=>td.onclick=()=>{mode=td.dataset.m;difficulty=td.dataset.d;begin()});
+ el.innerHTML=h+`</table><div class="mxnote">${n===MODES.length*3?'🏆 All '+n+' played!':n+' / '+MODES.length*3+' played · tap a cell to play it'} · darker = higher · 👑 = best in the column</div>`;
+ el.querySelectorAll('td[data-m]').forEach(td=>td.onclick=()=>{mode=td.dataset.m;if(isCap(mode))capMode=mode;difficulty=td.dataset.d;begin()});
 }
 async function loadCloud(){if(!(window.Arcade&&Arcade.user))return;const rows=await Arcade.myScores('flag-rush');cloud={};rows.forEach(r=>{const k=r.category+r.mode;cloud[k]=Math.max(cloud[k]||0,r.score)});renderMatrix()}
 document.addEventListener('DOMContentLoaded',()=>{if(window.Arcade)Arcade.onChange(()=>{cloud={};renderMatrix();loadCloud()})});
@@ -250,11 +310,13 @@ function offlineUrls(){
  return base.concat(currentCountries.filter(c=>!c.svg).map(c=>'https://flagcdn.com/w320/'+c.code.toLowerCase()+'.png'),[GEO_URL],oldFlags.map(o=>commonsFile(o.file)));
 }
 function offlineUI(){
- const el=$('#offline'),b=$('#dl');if(!el||el.dataset.busy)return;
+ const el=$('#offline'),b=$('#dl'),rm=$('#rm');if(!el||el.dataset.busy)return;
  let have=false;try{have=!!localStorage.getItem(OFFKEY)}catch(e){}
- el.textContent=have?'✈️ Saved for offline play':(navigator.onLine?'📶 Online':'✈️ Offline')+(LOCAL?'':' · map and old-flag modes need internet until saved');
- b.classList.toggle('hidden',have||!('serviceWorker' in navigator)||!navigator.onLine);
+ el.textContent=have?'✈️ Saved for offline play':(navigator.onLine?'📶 Online':'✈️ Offline')+(LOCAL?'':' · maps and old flags need internet until saved');
+ if(have&&navigator.storage&&navigator.storage.estimate)navigator.storage.estimate().then(e=>{if(!el.dataset.busy)el.textContent='✈️ Saved for offline play · '+(e.usage/1e6).toFixed(1)+' MB on this device'}).catch(()=>{});
+ b.classList.toggle('hidden',have||!('serviceWorker' in navigator)||!navigator.onLine);rm.classList.toggle('hidden',!have);
 }
+async function removeOffline(){try{await caches.delete('arcade-v1')}catch(e){}try{localStorage.removeItem(OFFKEY)}catch(e){}offlineUI()}
 async function saveOffline(){
  const b=$('#dl'),el=$('#offline');b.disabled=true;el.dataset.busy='1';
  try{await navigator.serviceWorker.ready}catch(e){}
@@ -264,11 +326,11 @@ async function saveOffline(){
   done=Math.min(urls.length,i+6);el.textContent='Saving for offline… '+Math.round(done/urls.length*100)+'%';
  }
  delete el.dataset.busy;
- if(bad<=Math.max(3,urls.length*.03)){try{localStorage.setItem(OFFKEY,String(Date.now()))}catch(e){}}
+ if(bad<=Math.max(3,urls.length*.03)){try{localStorage.setItem(OFFKEY,String(Date.now()))}catch(e){}try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}}
  else el.textContent='Some files could not be saved ('+bad+'). Try again when the connection is better.';
  b.disabled=false;offlineUI();
 }
-$('#dl').onclick=saveOffline;
+$('#dl').onclick=saveOffline;$('#rm').onclick=removeOffline;
 addEventListener('online',offlineUI);addEventListener('offline',offlineUI);
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))addEventListener('load',()=>navigator.serviceWorker.register('../arcade-sw.js').catch(()=>{}));
 
